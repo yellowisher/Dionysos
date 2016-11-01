@@ -1,0 +1,8 @@
+### Eclipse ###
+
+bin/
+tmp/
+.settings/
+.classpath
+.project
+.metadata

@@ -1,0 +1,26 @@
+[PROTOCOL]
+JN_'NICKNAME'	// Join with 'NICKNAME'
+SL_'INST'	// Select instrument
+UL_'INST'	// Unselect instrument
+LV_'NICKNAME'	// 'NICKNAME' left
+
+// Maybe chatting protocols?
+
+[PIANO]
+ # #   # # #   # #
+C D E F G A B C D E
+
+PU_C_0 // Piano keyUp
+PU_C#0
+PU_D_0
+PU_D#0
+.
+.
+.
+PD_D#1 // Piano keyDown
+PD_E_1
+
+
+(Example)
+00:07:652 PKD_E_1 
+00:09:185 PKU_C#0
