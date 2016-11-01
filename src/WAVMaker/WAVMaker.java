@@ -217,7 +217,7 @@ public class WAVMaker {
 	}
 
 	public static void main(String[] args) throws Exception {
-		WAVMaker wavMaker = new WAVMaker(new FileInputStream(new File("WAHAA.txt")));
+		WAVMaker wavMaker = new WAVMaker(new FileInputStream(new File("TEST.txt")));
 		wavMaker.createWAV();
 		wavMaker.save();
 	}

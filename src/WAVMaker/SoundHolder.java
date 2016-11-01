@@ -60,7 +60,7 @@ public class SoundHolder {
 			case "E_1":
 				if (!notes.containsKey(noteName)) {
 					try {
-						FileInputStream fos = new FileInputStream(new File("Audio/Piano/" + noteName + ".wav"));
+						FileInputStream fos = new FileInputStream(new File("Resource/Audio/Piano/" + noteName + ".wav"));
 
 						// Cut header
 						fos.skip(44);

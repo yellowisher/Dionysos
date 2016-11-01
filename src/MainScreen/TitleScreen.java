@@ -34,7 +34,7 @@ public class TitleScreen{
 		mainFrame.setLocation((screenSize.width - WIDTH) / 2, (screenSize.height - HEIGHT) / 2);
 
 		// Show title lyra image
-		ImageIcon titleImageIcon = new ImageIcon("Image/Lyra.png");
+		ImageIcon titleImageIcon = new ImageIcon("Resource/Image/Lyra.png");
 		JLabel titleImage = new JLabel(titleImageIcon);
 		int imageWidth = titleImageIcon.getIconWidth();
 		int imageHeight = titleImageIcon.getIconHeight();

@@ -15,7 +15,7 @@ import Recorder.Recorder;
 public class Piano {
 
 	public static void main(String[] args) throws Exception {
-		AudioInputStream ais = AudioSystem.getAudioInputStream(new File("Audio/Piano/D#0.wav"));
+		AudioInputStream ais = AudioSystem.getAudioInputStream(new File("Resource/Audio/Piano/D#0.wav"));
 		Clip c = AudioSystem.getClip();
 		c.open(ais);
 		Scanner kb=new Scanner(System.in);
