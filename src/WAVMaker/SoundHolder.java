@@ -22,10 +22,10 @@ public class SoundHolder {
 
 	public FileInputStream getSound(Character type, String noteName) {
 		switch (type) {
-		case 'P':
-			return pianoSound.getSound(noteName);
-		case 'D':
-		case 'G':
+			case 'P' :
+				return pianoSound.getSound(noteName);
+			case 'D' :
+			case 'G' :
 		}
 		System.out.println("Unknown note!");
 		return null;
@@ -41,40 +41,40 @@ public class SoundHolder {
 		public FileInputStream getSound(String noteName) {
 
 			switch (noteName) {
-			case "C_0":
-			case "C#0":
-			case "D_0":
-			case "D#0":
-			case "E_0":
-			case "F_0":
-			case "F#0":
-			case "G_0":
-			case "G#0":
-			case "A_0":
-			case "A#0":
-			case "B_0":
-			case "C_1":
-			case "C#1":
-			case "D_1":
-			case "D#1":
-			case "E_1":
-				if (!notes.containsKey(noteName)) {
-					try {
-						FileInputStream fos = new FileInputStream(new File("Resource/Audio/Piano/" + noteName + ".wav"));
+				case "C_0" :
+				case "C#0" :
+				case "D_0" :
+				case "D#0" :
+				case "E_0" :
+				case "F_0" :
+				case "F#0" :
+				case "G_0" :
+				case "G#0" :
+				case "A_0" :
+				case "A#0" :
+				case "B_0" :
+				case "C_1" :
+				case "C#1" :
+				case "D_1" :
+				case "D#1" :
+				case "E_1" :
+					if (!notes.containsKey(noteName)) {
+						try {
+							FileInputStream fos = new FileInputStream(new File("Resource/Audio/Piano/" + noteName + ".wav"));
 
-						// Cut header
-						fos.skip(44);
-						notes.put(noteName, fos);
-					} catch (Exception e) {
-						System.out.println("Cannot find audio file");
-						e.printStackTrace();
+							// Cut header
+							fos.skip(44);
+							notes.put(noteName, fos);
+						} catch (Exception e) {
+							System.out.println("Cannot find audio file");
+							e.printStackTrace();
+						}
 					}
-				}
-				return notes.get(noteName);
+					return notes.get(noteName);
 
-			default:
-				System.out.println("Wrong note!");
-				return null;
+				default :
+					System.out.println("Wrong note!");
+					return null;
 			}
 		}
 	}

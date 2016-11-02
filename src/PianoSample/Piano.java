@@ -18,23 +18,22 @@ public class Piano {
 		AudioInputStream ais = AudioSystem.getAudioInputStream(new File("Resource/Audio/Piano/D#0.wav"));
 		Clip c = AudioSystem.getClip();
 		c.open(ais);
-		Scanner kb=new Scanner(System.in);
-		
-		Recorder recorder=new Recorder();
+		Scanner kb = new Scanner(System.in);
+
+		Recorder recorder = new Recorder();
 		long startTime = System.currentTimeMillis();
-		
-		escape:
-		while(true){
-			switch(kb.nextInt()){
-			case 1:
-				c.stop();
-				c.flush();
-				c.setFramePosition(0);
-				c.start();
-				recorder.record("Piano,C");
-				break;
-			case 2:
-				break escape;
+
+		escape : while (true) {
+			switch (kb.nextInt()) {
+				case 1 :
+					c.stop();
+					c.flush();
+					c.setFramePosition(0);
+					c.start();
+					recorder.record("Piano,C");
+					break;
+				case 2 :
+					break escape;
 			}
 		}
 		recorder.stop((int) (System.currentTimeMillis() - startTime));

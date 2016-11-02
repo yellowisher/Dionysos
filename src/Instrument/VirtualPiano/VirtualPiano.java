@@ -64,6 +64,8 @@ public class VirtualPiano extends JPanel implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		System.out.println(e.getKeyChar());
+
 		Key key = keyMap.get(e.getKeyCode());
 		if (key == null) return;
 

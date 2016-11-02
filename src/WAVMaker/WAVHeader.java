@@ -4,7 +4,7 @@ public class WAVHeader {
 	static final byte[] RIFF = { 'R', 'I', 'F', 'F' };
 	static final byte[] WAVE = { 'W', 'A', 'V', 'E' };
 	static final byte[] FMT = { 'f', 'm', 't', ' ' };
-	static final byte[] DATA = { 'd', 'a', 't', 'a' };
+	static final byte[] DATA = {'d', 'a', 't', 'a'};
 
 	byte[] header;
 	int dataLength;

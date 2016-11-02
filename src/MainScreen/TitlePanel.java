@@ -93,14 +93,14 @@ public class TitlePanel extends JPanel {
 			if (type.equals("Join Room")) {
 				String address = getAddress();
 				// TODO : Try connect here
-			} else if (type.equals("Create Room")) {
+			}
+			else if (type.equals("Create Room")) {
 				// TODO : Create room here
 			}
 		}
 	}
 
 	private String getAddress() {
-		return JOptionPane.showInputDialog(this, "Enter IP address of room:", "Joining room",
-				JOptionPane.PLAIN_MESSAGE);
+		return JOptionPane.showInputDialog(this, "Enter IP address of room:", "Joining room", JOptionPane.PLAIN_MESSAGE);
 	}
 }

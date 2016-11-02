@@ -52,8 +52,7 @@ public class WAVMaker {
 
 	int toIndex(int time) {
 		int index = (int) Math.ceil(sampleRate * bitPerSample / 8 * numChannel * time * 0.001);
-		if (index % 2 == 1)
-			index++;
+		if (index % 2 == 1) index++;
 		return index;
 	}
 
@@ -96,40 +95,40 @@ public class WAVMaker {
 
 				switch (msg.charAt(0)) {
 
-				// Case of Piano
-				// Main idea : when key(note) is down, store it to map.
-				// When key is up, if that key(note) exists in map, pop it out and
-				// write on empty file.
-				// And if key is up earlier than its(note) play time, fade out
-				// it.
-				case 'P':
-					switch (msg.charAt(1)) {
+					// Case of Piano
+					// Main idea : when key(note) is down, store it to map.
+					// When key is up, if that key(note) exists in map, pop it out and
+					// write on empty file.
+					// And if key is up earlier than its(note) play time, fade out
+					// it.
+					case 'P' :
+						switch (msg.charAt(1)) {
 
-					// If piano key is up, fade out note according to key
-					// up/down time
-					case 'U':
-						if (noteMap.containsKey(note)) {
-							byte[] origNote = getSound(msg.charAt(0), note);
-							int keyDownTime = noteMap.get(note);
-							noteMap.remove(note);
-							byte[] newNote = fadeOut(origNote, time - keyDownTime);
-							write(newNote, keyDownTime);
+							// If piano key is up, fade out note according to key
+							// up/down time
+							case 'U' :
+								if (noteMap.containsKey(note)) {
+									byte[] origNote = getSound(msg.charAt(0), note);
+									int keyDownTime = noteMap.get(note);
+									noteMap.remove(note);
+									byte[] newNote = fadeOut(origNote, time - keyDownTime);
+									write(newNote, keyDownTime);
+								}
+								noteMap.remove(note);
+								break;
+
+							// If piano key is down, put it into map with current time
+							case 'D' :
+								noteMap.put(note, time);
+								break;
 						}
-						noteMap.remove(note);
 						break;
 
-					// If piano key is down, put it into map with current time
-					case 'D':
-						noteMap.put(note, time);
-						break;
-					}
-					break;
+					// Case of Drum
+					case 'D' :
 
-				// Case of Drum
-				case 'D':
-
-					// Case of Guitar
-				case 'G':
+						// Case of Guitar
+					case 'G' :
 				}
 			}
 
@@ -178,8 +177,7 @@ public class WAVMaker {
 	// Fade out given note
 	private byte[] fadeOut(byte[] note, int fadeStart) {
 		int start = toIndex(fadeStart);
-		if (start + FADE_TIME > note.length)
-			return note;
+		if (start + FADE_TIME > note.length) return note;
 
 		for (int i = 0; i < FADE_TIME; i += 2) {
 			short orig_0 = (short) (note[start + i] & 0xff);
