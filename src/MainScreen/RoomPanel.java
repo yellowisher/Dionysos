@@ -5,8 +5,8 @@ import java.awt.Color;
 
 import javax.swing.JPanel;
 
-import VirtualPiano.VirtualPiano;
-import a.VirtualNothing;
+import Instrument.VirtualNothing;
+import Instrument.VirtualPiano.VirtualPiano;
 
 public class RoomPanel extends JPanel {
 	VirtualInst inst;
@@ -26,7 +26,7 @@ public class RoomPanel extends JPanel {
 			setBounds(0, 150, 800, 350);
 
 			add("Nothing", new VirtualNothing());
-			add("Piano", new VirtualNothing());
+			add("Piano", new VirtualPiano());
 			// add("Drum", new VirtualDrum());
 			// add("Guitar", new VirtualGuitar());
 
