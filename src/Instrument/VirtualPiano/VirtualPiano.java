@@ -23,7 +23,7 @@ public class VirtualPiano extends JPanel implements KeyListener {
 		for (int i = 0; i < 7; i++) {
 			// Skips black keys
 			int g = i + ((i + 1) / 3);
-			blackKeys[i] = new BlackKey(null);
+			blackKeys[i] = new BlackKey();
 			blackKeys[i].setBounds(89 + (int) (73 * g), 33, keyWidth, keyHeight);
 			add(blackKeys[i]);
 		}
@@ -32,30 +32,30 @@ public class VirtualPiano extends JPanel implements KeyListener {
 		keyHeight = WhiteKey.keyUpImage.getIconHeight();
 
 		for (int i = 0; i < 10; i++) {
-			whiteKeys[i] = new WhiteKey(null);
+			whiteKeys[i] = new WhiteKey();
 			whiteKeys[i].setBounds(33 + 73 * i, 33, keyWidth, keyHeight);
 			add(whiteKeys[i]);
 		}
 
 		//@preOn
-		keyMap.put(KeyEvent.VK_Z,			whiteKeys[0]);
-		keyMap.put(KeyEvent.VK_X,			whiteKeys[1]);
-		keyMap.put(KeyEvent.VK_C,			whiteKeys[2]);
-		keyMap.put(KeyEvent.VK_V,			whiteKeys[3]);
-		keyMap.put(KeyEvent.VK_B,			whiteKeys[4]);
-		keyMap.put(KeyEvent.VK_N,			whiteKeys[5]);
-		keyMap.put(KeyEvent.VK_M,			whiteKeys[6]);
-		keyMap.put(KeyEvent.VK_COMMA,		whiteKeys[7]);
-		keyMap.put(KeyEvent.VK_PERIOD,		whiteKeys[8]);
-		keyMap.put(KeyEvent.VK_SLASH,		whiteKeys[9]);
+		keyMap.put(KeyEvent.VK_Z,			whiteKeys[0].setNoteName("C_0"));
+		keyMap.put(KeyEvent.VK_X,			whiteKeys[1].setNoteName("D_0"));
+		keyMap.put(KeyEvent.VK_C,			whiteKeys[2].setNoteName("E_0"));
+		keyMap.put(KeyEvent.VK_V,			whiteKeys[3].setNoteName("F_0"));
+		keyMap.put(KeyEvent.VK_B,			whiteKeys[4].setNoteName("G_0"));
+		keyMap.put(KeyEvent.VK_N,			whiteKeys[5].setNoteName("A_0"));
+		keyMap.put(KeyEvent.VK_M,			whiteKeys[6].setNoteName("B_0"));
+		keyMap.put(KeyEvent.VK_COMMA,		whiteKeys[7].setNoteName("C_1"));
+		keyMap.put(KeyEvent.VK_PERIOD,		whiteKeys[8].setNoteName("D_1"));
+		keyMap.put(KeyEvent.VK_SLASH,		whiteKeys[9].setNoteName("E_1"));
 		
-		keyMap.put(KeyEvent.VK_S,			blackKeys[0]);
-		keyMap.put(KeyEvent.VK_D,			blackKeys[1]);
-		keyMap.put(KeyEvent.VK_G,			blackKeys[2]);
-		keyMap.put(KeyEvent.VK_H,			blackKeys[3]);
-		keyMap.put(KeyEvent.VK_J,			blackKeys[4]);
-		keyMap.put(KeyEvent.VK_L,			blackKeys[5]);
-		keyMap.put(KeyEvent.VK_SEMICOLON,	blackKeys[6]);
+		keyMap.put(KeyEvent.VK_S,			blackKeys[0].setNoteName("C#0"));
+		keyMap.put(KeyEvent.VK_D,			blackKeys[1].setNoteName("D#0"));
+		keyMap.put(KeyEvent.VK_G,			blackKeys[2].setNoteName("F#0"));
+		keyMap.put(KeyEvent.VK_H,			blackKeys[3].setNoteName("G#0"));
+		keyMap.put(KeyEvent.VK_J,			blackKeys[4].setNoteName("A#0"));
+		keyMap.put(KeyEvent.VK_L,			blackKeys[5].setNoteName("C#1"));
+		keyMap.put(KeyEvent.VK_SEMICOLON,	blackKeys[6].setNoteName("D#1"));
 		//@preOff
 
 		addKeyListener(this);
@@ -64,8 +64,6 @@ public class VirtualPiano extends JPanel implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		System.out.println(e.getKeyChar());
-
 		Key key = keyMap.get(e.getKeyCode());
 		if (key == null) return;
 

@@ -1,19 +1,13 @@
 package MainScreen;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
-import java.awt.Label;
 import java.awt.Toolkit;
-
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 public class MainFrame extends JFrame {
-	static final int WIDTH = 800;
-	static final int HEIGHT = 600;
+	static final int WIDTH = 920;
+	static final int HEIGHT = 756;
 
 	CardLayout panelHolder = new CardLayout();
 
@@ -23,7 +17,7 @@ public class MainFrame extends JFrame {
 
 		// Setting for CardLayout
 		getContentPane().setLayout(panelHolder);
-		getContentPane().add("Title", new TitlePanel(WIDTH, HEIGHT));
+		getContentPane().add("Title", new TitlePanel(WIDTH, HEIGHT, this));
 		getContentPane().add("Room", new RoomPanel(WIDTH, HEIGHT));
 
 		// Set frame position to center of screen
@@ -43,7 +37,7 @@ public class MainFrame extends JFrame {
 		MainFrame mainFrame = new MainFrame();
 		mainFrame.panelHolder.next(mainFrame.getContentPane());
 		mainFrame.setVisible(true);
-		mainFrame.changePanel("Piano");
+		mainFrame.changePanel("Title");
 	}
 
 }

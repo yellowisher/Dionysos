@@ -7,9 +7,8 @@ class WhiteKey extends Key {
 	static ImageIcon keyUpImage = new ImageIcon("Resource/Image/Piano/Key_White.png");
 	static ImageIcon keyDownImage = new ImageIcon("Resource/Image/Piano/Key_White_Blue.png");
 
-	public WhiteKey(Clip clip) {
+	public WhiteKey() {
 		super(keyUpImage);
-		this.clip = clip;
 	}
 
 	@Override

@@ -20,7 +20,7 @@ import org.omg.CORBA.PRIVATE_MEMBER;
 public class WAVMaker {
 	final static int FADE_TIME = 12000;
 
-	int numChannel = 1;
+	private int numChannel = 1;
 	int sampleRate = 44100;
 	int bitPerSample = 16;
 
@@ -31,7 +31,7 @@ public class WAVMaker {
 	HashMap<String, Integer> noteMap;
 	SoundHolder soundHolder;
 
-	int readTime() throws IOException {
+	private int readTime() throws IOException {
 		byte[] time = new byte[9];
 		history.read(time, 0, 9);
 		history.skip(1);

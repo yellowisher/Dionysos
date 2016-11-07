@@ -7,19 +7,21 @@ class BlackKey extends Key {
 	static ImageIcon keyUpImage = new ImageIcon("Resource/Image/Piano/Key_Black.png");
 	static ImageIcon keyDownImage = new ImageIcon("Resource/Image/Piano/Key_Black_Blue.png");
 
-	public BlackKey(Clip clip) {
+	public BlackKey() {
 		super(keyUpImage);
-		this.clip = clip;
 	}
 
 	@Override
 	void keyDown() {
+		if (isPressed) return;
+		isPressed = true;
 		setIcon(keyDownImage);
 		// Play clip here
 	}
 
 	@Override
 	void keyUp() {
+		isPressed = false;
 		setIcon(keyUpImage);
 		// Fade out clip here
 	}

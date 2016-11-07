@@ -17,10 +17,15 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
+import LobbyClient.ClientRoomDialog;
+
 public class TitlePanel extends JPanel {
 
-	TitlePanel(int frameWidth, int frameHeight) {
+	JFrame frame;
+
+	TitlePanel(int frameWidth, int frameHeight, JFrame frame) {
 		this.setLayout(null);
+		this.frame = frame;
 
 		// Show title lyra image
 		ImageIcon titleImageIcon = new ImageIcon("Resource/Image/Lyra.png");
@@ -32,7 +37,7 @@ public class TitlePanel extends JPanel {
 
 		// Panel for join room
 		JPanel joinRoom = new JPanel();
-		joinRoom.setBounds(0, imageHeight + 10, frameWidth / 2, frameHeight - imageHeight - 10);
+		joinRoom.setBounds(0, imageHeight + 90, frameWidth / 2, frameHeight - imageHeight - 90);
 		joinRoom.setBorder(new LineBorder(new Color(247, 145, 0), 2));
 		joinRoom.setLayout(new GridBagLayout());
 		add(joinRoom);
@@ -59,7 +64,7 @@ public class TitlePanel extends JPanel {
 
 		// Panel for create room
 		JPanel createRoom = new JPanel();
-		createRoom.setBounds(frameWidth / 2, imageHeight + 10, frameWidth / 2, frameHeight - imageHeight - 10);
+		createRoom.setBounds(frameWidth / 2, imageHeight + 90, frameWidth / 2, frameHeight - imageHeight - 90);
 		createRoom.setBorder(new LineBorder(new Color(247, 145, 0), 2));
 		createRoom.setLayout(new GridBagLayout());
 		add(createRoom);
@@ -91,16 +96,12 @@ public class TitlePanel extends JPanel {
 			String type = e.getActionCommand();
 
 			if (type.equals("Join Room")) {
-				String address = getAddress();
+				new ClientRoomDialog(frame);
 				// TODO : Try connect here
 			}
 			else if (type.equals("Create Room")) {
 				// TODO : Create room here
 			}
 		}
-	}
-
-	private String getAddress() {
-		return JOptionPane.showInputDialog(this, "Enter IP address of room:", "Joining room", JOptionPane.PLAIN_MESSAGE);
 	}
 }
