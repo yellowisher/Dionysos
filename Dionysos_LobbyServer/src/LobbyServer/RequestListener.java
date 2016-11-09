@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.HashMap;
 
@@ -38,11 +37,11 @@ public class RequestListener extends Thread {
 				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, receivePacket.getSocketAddress());
 				listenSocket.send(sendPacket);
 				
-				System.out.println("SERVER : SENT!");
+				System.out.println("Sent room list to client");
 				
 			} catch (IOException e) {
 				listenSocket.close();
-				e.printStackTrace();
+				System.out.println("Request listener closing");
 			}
 		}
 	}

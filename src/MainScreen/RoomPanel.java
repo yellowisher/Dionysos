@@ -26,7 +26,7 @@ public class RoomPanel extends JPanel {
 			setBounds(0, 150, 800, 350);
 
 			add("Nothing", new VirtualNothing());
-			add("Piano", new VirtualPiano());
+			//add("Piano", new VirtualPiano());
 			// add("Drum", new VirtualDrum());
 			// add("Guitar", new VirtualGuitar());
 

@@ -3,6 +3,7 @@ package RoomInfo;
 import java.io.Serializable;
 
 public class RoomInfo implements Serializable {
+	private static final long serialVersionUID = 322L;
 	public String roomName;
 	public String IPAdress;
 	public int port;
@@ -12,6 +13,6 @@ public class RoomInfo implements Serializable {
 	public RoomInfo(String roomName, String password) {
 		this.roomName = roomName;
 		this.password = password;
-		numUser = 1;
+		numUser = 0;
 	}
 }

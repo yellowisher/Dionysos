@@ -22,5 +22,16 @@ PD_E_1
 
 
 (Example)
-00:07:652 PKD_E_1 
-00:09:185 PKU_C#0
+00:07:652 PD_E_1 
+00:09:185 PU_C#0
+
+
+[DRUM]
+crash		CRS
+floor_tom	FTM
+hihat		HIH
+kick		KIK
+low_tom		LTM
+mid_tom		MTM
+rider		RID
+snare		SNR

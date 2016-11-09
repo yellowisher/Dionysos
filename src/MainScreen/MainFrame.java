@@ -5,20 +5,28 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 
+import LobbyClient.LobbyServerInfo;
+import RoomScreen.Layout.Main;
+
 public class MainFrame extends JFrame {
 	static final int WIDTH = 920;
 	static final int HEIGHT = 756;
 
 	CardLayout panelHolder = new CardLayout();
+	public Main roomPanel = new Main();
+	
+	public static MainFrame instance;
 
 	MainFrame() {
+		instance = this;
 		setTitle("Dionysos");
 		getContentPane().setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
 		// Setting for CardLayout
 		getContentPane().setLayout(panelHolder);
 		getContentPane().add("Title", new TitlePanel(WIDTH, HEIGHT, this));
-		getContentPane().add("Room", new RoomPanel(WIDTH, HEIGHT));
+
+		getContentPane().add("Room", roomPanel);
 
 		// Set frame position to center of screen
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -34,6 +42,8 @@ public class MainFrame extends JFrame {
 	}
 
 	public static void main(String[] args) {
+		LobbyServerInfo.init();
+
 		MainFrame mainFrame = new MainFrame();
 		mainFrame.panelHolder.next(mainFrame.getContentPane());
 		mainFrame.setVisible(true);

@@ -1,4 +1,4 @@
-package Instrument.VirtualPiano;
+package Instrument.VirtualDrum;
 
 import javax.sound.sampled.Clip;
 import javax.swing.JLabel;

@@ -1,8 +1,14 @@
 package LobbyClient;
 
 import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,6 +21,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -23,23 +30,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import MainScreen.MainFrame;
 import RoomInfo.RoomInfo;
+import RoomScreen.Connection.ConnectInfo;
+import RoomScreen.Layout.Main;
 
 public class ClientRoomDialog extends JDialog {
-	static InetAddress sAddress;
-	static final int sPort = 9322;
-
 	DefaultListModel<RoomInfo> listModel;
+	MainFrame frame;
 
-	public ClientRoomDialog(JFrame parent) {
+	public ClientRoomDialog(MainFrame parent) {
 		super(parent, true);
 
-		try {
-			sAddress = InetAddress.getByName("localhost");
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-
+		setTitle("Room List");
 		setSize(500, 400);
 		setLocation(parent.getLocation().x + (parent.getWidth() - getWidth()) / 2, parent.getLocation().y + (parent.getHeight() - getHeight()) / 2);
 
@@ -56,6 +59,29 @@ public class ClientRoomDialog extends JDialog {
 		refreshBtn.addActionListener(new ButtonListener());
 		panel.add(refreshBtn, BorderLayout.SOUTH);
 
+		roomList.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2 && !e.isConsumed()) {
+					e.consume();
+					RoomInfo roomInfo = (RoomInfo) roomList.getSelectedValue();
+					
+					if (roomInfo != null) {
+						if (!roomInfo.password.equals("")) {
+							String input = JOptionPane.showInputDialog(frame, "Input password :", "Password required", JOptionPane.PLAIN_MESSAGE);
+							if(!input.equals(roomInfo.password)) {
+								JOptionPane.showMessageDialog(frame, "Wrong password! Try again", "Wrong password", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+
+						ConnectInfo info = new ConnectInfo(roomInfo.IPAdress, roomInfo.port, ConnectInfo.JOIN);
+						parent.changePanel("Room");
+						dispose();
+						parent.roomPanel.joinRoom(info);								
+					}
+				}
+        	}
+        });
 		if (refresh()) setVisible(true);
 	}
 
@@ -76,7 +102,7 @@ public class ClientRoomDialog extends JDialog {
 
 		try {
 			socket = new DatagramSocket();
-			DatagramPacket request = new DatagramPacket(send, send.length, sAddress, sPort);
+			DatagramPacket request = new DatagramPacket(send, send.length, LobbyServerInfo.IPAddress, LobbyServerInfo.clientPort);
 			DatagramPacket receivePacket = new DatagramPacket(data, data.length);
 			socket.send(request);
 			socket.setSoTimeout(1500);
@@ -92,6 +118,7 @@ public class ClientRoomDialog extends JDialog {
 
 					if (map.isEmpty()) {
 						// no room
+						
 					}
 					else {
 						for (RoomInfo roomInfo : map.values()) {
@@ -102,17 +129,12 @@ public class ClientRoomDialog extends JDialog {
 				}
 			}
 		} catch (SocketTimeoutException e) {
-			JOptionPane.showMessageDialog(
-					this, 
-					"Cannot connect to lobby server", 
-					"Lobby server error", 
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Cannot connect to lobby server", "Lobby server error", JOptionPane.ERROR_MESSAGE);
 			socket.close();
 			return false;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
-		//setVisible(true);
 	}
 }

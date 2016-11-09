@@ -18,12 +18,13 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
 import LobbyClient.ClientRoomDialog;
+import LobbyClient.HostRoomDialog;
 
 public class TitlePanel extends JPanel {
 
-	JFrame frame;
+	MainFrame frame;
 
-	TitlePanel(int frameWidth, int frameHeight, JFrame frame) {
+	TitlePanel(int frameWidth, int frameHeight, MainFrame frame) {
 		this.setLayout(null);
 		this.frame = frame;
 
@@ -100,6 +101,7 @@ public class TitlePanel extends JPanel {
 				// TODO : Try connect here
 			}
 			else if (type.equals("Create Room")) {
+				new HostRoomDialog(frame);
 				// TODO : Create room here
 			}
 		}

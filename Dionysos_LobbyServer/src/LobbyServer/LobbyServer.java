@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.ClientInfoStatus;
 import java.util.HashMap;
 
 import RoomInfo.RoomInfo;
@@ -15,6 +16,7 @@ public class LobbyServer {
 	private static HashMap<String, RoomInfo> roomMap = new HashMap<String, RoomInfo>();
 
 	public static void main(String[] args) throws Exception {
+
 		System.out.println("Lobby server is running!");
 		ServerSocket hostListener = new ServerSocket(PORT);
 
@@ -56,28 +58,35 @@ public class LobbyServer {
 						return;
 					}
 
-					writer.println("CREATED");
-					room.IPAdress = socket.getInetAddress().getHostAddress();
-					room.port = socket.getPort();
+					if (room.IPAdress == null) room.IPAdress = socket.getInetAddress().getHostAddress();
+					writer.println(room.IPAdress + "/" + room.port);
 					roomMap.put(room.roomName, room);
 				}
 
+				String msg;
+				reader = new ObjectInputStream(socket.getInputStream());
 				while (true) {
-					String msg = (String) reader.readObject();
-					
-					System.out.println(msg);
+					msg = (String) reader.readObject();
+					if (msg != null) {
+						System.out.println("Client in" + room.roomName + " has " + msg);
+
+						if (msg.equals("JOIN")) {
+							room.numUser++;
+						}
+						else if (msg.equals("LEFT")) {
+							if (--room.numUser < 0) room.numUser = 0;
+						}
+					}
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			} finally {
 				try {
-
-					System.out.println("CLOSE!");
-
+					System.out.println("A room is closed");
 					socket.close();
 					roomMap.remove(room.roomName);
 				} catch (IOException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
 		}
