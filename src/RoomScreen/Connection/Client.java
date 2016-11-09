@@ -201,8 +201,12 @@ public class Client extends Thread {
 				String line = in.readLine();
 
 				if (line.startsWith("SUBMITNAME")) {
-					name = getNick(); // id input msg.
-					if (name == null || name.equals("")) System.exit(0);
+					
+					while(true) {
+						name = getNick(); // id input msg.
+						if (name == null || name.equals("")) continue;
+						break;
+					}
 					out.println(name);
 				}
 				else if (line.startsWith("NAMEACCEPTED")) {
@@ -211,12 +215,11 @@ public class Client extends Thread {
 				}
 				else if (line.startsWith("BROADCAST")) {
 					//server broadcasts room information.
-					frame.appendStr(line.substring(18) + "\n", "BLUE");
-
+					frame.appendStr(line.substring(19) + "\n", "BLUE");
 				}
 
 				else if (line.startsWith("MESSAGE")) {
-					frame.appendStr(line.substring(8) + "\n", null);
+					frame.appendStr(line.substring(7) + "\n", null);
 				}
 				else if (line.startsWith("USER_DEL_ALL")) {
 					listModel.removeAllElements();

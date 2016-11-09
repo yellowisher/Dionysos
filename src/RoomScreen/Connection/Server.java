@@ -57,7 +57,7 @@ public class Server extends Thread {
 			e.printStackTrace();
 		} finally {
 			try {
-				device.deletePortMapping(port, "TCP");
+				if (device != null) device.deletePortMapping(port, "TCP");
 				listener.close();
 			} catch (IOException | SAXException e) {
 				e.printStackTrace();
@@ -107,19 +107,14 @@ public class Server extends Thread {
 
 				while (true) {
 					out.println("SUBMITNAME");
+					name = in.readLine();
 
-					while (true) {
-						name = in.readLine();
-						System.out.println("New Client - " + name);
-
-						synchronized (names) {
-							if (!names.contains(name)) {
-								names.add(name);
-								break;
-							}
+					synchronized (names) {
+						if (!names.contains(name)) {
+							names.add(name);
+							break;
 						}
 					}
-					if (names.contains(name)) break;
 				}
 
 				out.println("NAMEACCEPTED " + name);

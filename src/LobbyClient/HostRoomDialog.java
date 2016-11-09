@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.naming.ldap.ExtendedRequest;
 import javax.swing.JButton;
@@ -92,9 +93,15 @@ public class HostRoomDialog extends JDialog {
 			RoomInfo roomInfo = new RoomInfo(roomName, password);
 			boolean isLocal = localOnly.isSelected();
 
-			//			if(isLocal) {
-			//				roomInfo.IPAdress=InetAddress.getLocalHost().getHostAddress(),
-			//			}
+			if (isLocal) {
+				try {
+					roomInfo.IPAdress = InetAddress.getLocalHost().getHostAddress();
+					System.out.println(roomInfo.IPAdress);
+				} catch (UnknownHostException e1) {
+					e1.printStackTrace();
+				}
+			}
+
 			try {
 				socket = new Socket(LobbyServerInfo.IPAddress, LobbyServerInfo.hostPort);
 
@@ -122,19 +129,24 @@ public class HostRoomDialog extends JDialog {
 
 							ConnectInfo info = new ConnectInfo(externalAddr[0], roomInfo.port, ConnectInfo.CREATE);
 
-							// Setup UPNP
-							GatewayDiscover discover = new GatewayDiscover();
-							discover.discover();
-							GatewayDevice device = discover.getValidGateway();
+							if (!isLocal) {
+								// Setup UPNP
+								GatewayDiscover discover = new GatewayDiscover();
+								discover.discover();
+								GatewayDevice device = discover.getValidGateway();
+								PortMappingEntry portMapping = new PortMappingEntry();
 
-							PortMappingEntry portMapping = new PortMappingEntry();
-							if (!device.addPortMapping(pt, pt, device.getLocalAddress().getHostAddress(), "TCP", "Dionysos!")) {
-								System.out.println("FAILED!");
-								return;
+								if (device == null) {
+									System.out.println("NULL!");
+								}
+								else if (!device.addPortMapping(pt, pt, device.getLocalAddress().getHostAddress(), "TCP", "Dionysos!")) {
+									System.out.println("FAILED!");
+									return;
+								}
+								parent.roomPanel.createRoom(info, device, listener, socket);
 							}
+							else parent.roomPanel.createRoom(info, null, listener, socket);
 
-							parent.roomPanel.createRoom(info, device, listener, socket);
-							
 							parent.changePanel("Room");
 							dispose();
 							parent.roomPanel.joinRoom(info);
