@@ -128,7 +128,6 @@ public class Server extends Thread {
 
 				while (true) {
 					String input = in.readLine();
-					//System.out.println("[" + name + "] : " + input);
 					if (input == null) {
 						return;
 					}
@@ -190,9 +189,7 @@ public class Server extends Thread {
 							String n = itr4.next();
 							writer.println("USER_ADD " + n);
 						}
-						System.out.println("Disconnected - " + name);
 					}
-
 				}
 				try {
 					socket.close();

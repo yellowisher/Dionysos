@@ -95,8 +95,6 @@ public class Main extends JPanel {
 			rows++;
 		}
 
-		System.out.println(rows);
-
 		document = (StyledDocument) msgArea.getDocument();
 		if (type != null) document.insertString(document.getLength(), str, document.getStyle("BLUE"));
 		else document.insertString(document.getLength(), str, null);

@@ -45,7 +45,6 @@ public class VirtualDrum extends JPanel implements KeyListener {
 		setBackground(new java.awt.Color(21, 21, 21));
 		setSize(920, 350);
 		ImageIcon icon = new ImageIcon("Resource/Image/drum/drum_Panel.jpg");
-		System.out.println("생성완료");
 		jLabel1.setIcon(icon);
 		jLabel1.setOpaque(true);
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

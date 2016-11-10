@@ -156,7 +156,6 @@ public class Client extends Thread {
 	}
 
 	private String getNick() {
-		System.out.print("CALLED");
 		return JOptionPane.showInputDialog(frame, "Choose a screen name:", "Screen name selection", JOptionPane.PLAIN_MESSAGE);
 	}
 
@@ -226,12 +225,10 @@ public class Client extends Thread {
 
 					switch (line.charAt(0)) {
 						case 'P' :
-							//if recording
 							if (line.charAt(1) == 'D') pm.play("Piano", note);
 							break;
 						case 'G' :
 						case 'D' :
-
 							if (line.charAt(1) == 'H') pm.play("Drum", note);
 					}
 				}

@@ -52,7 +52,7 @@ public class WAVMaker {
 	}
 
 	int toIndex(int time) {
-		int index = (int) Math.ceil(sampleRate * bitPerSample / 8 * numChannel * time * 0.001);
+		int index = (int) Math.ceil(time * 0.001 * sampleRate * (bitPerSample / 8) * numChannel);
 		if (index % 2 == 1) index++;
 		return index;
 	}
@@ -66,6 +66,7 @@ public class WAVMaker {
 			int duration = readTime();
 			history.skip(2);
 			dataLength = toIndex(duration);
+			System.out.println(dataLength);
 			dataBytes = new byte[dataLength];
 		} catch (IOException e) {
 			System.out.println("Unknown history file");
