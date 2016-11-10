@@ -59,7 +59,7 @@ public class LobbyServer {
 					}
 
 					if (room.IPAdress == null) room.IPAdress = socket.getInetAddress().getHostAddress();
-					writer.println(room.IPAdress + "/" + room.port);
+					writer.println(room.IPAdress + "/" + socket.getPort());
 					roomMap.put(room.roomName, room);
 				}
 

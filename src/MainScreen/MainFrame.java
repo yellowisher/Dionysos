@@ -25,7 +25,6 @@ public class MainFrame extends JFrame {
 		// Setting for CardLayout
 		getContentPane().setLayout(panelHolder);
 		getContentPane().add("Title", new TitlePanel(WIDTH, HEIGHT, this));
-
 		getContentPane().add("Room", roomPanel);
 
 		// Set frame position to center of screen

@@ -10,7 +10,6 @@ import java.util.HashMap;
 
 import RoomInfo.RoomInfo;
 
-
 public class RequestListener extends Thread {
 	private static final int PORT = 9322;
 
@@ -36,9 +35,9 @@ public class RequestListener extends Thread {
 
 				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, receivePacket.getSocketAddress());
 				listenSocket.send(sendPacket);
-				
-				System.out.println("Sent room list to client");
-				
+
+				System.out.println("Send room list to " + receivePacket.getSocketAddress());
+
 			} catch (IOException e) {
 				listenSocket.close();
 				System.out.println("Request listener closing");

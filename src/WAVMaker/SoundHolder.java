@@ -25,6 +25,7 @@ public class SoundHolder {
 			case 'P' :
 				return pianoSound.getSound(noteName);
 			case 'D' :
+				return drumSound.getSound(noteName);
 			case 'G' :
 		}
 		System.out.println("Unknown note!");
@@ -39,48 +40,44 @@ public class SoundHolder {
 		}
 
 		public FileInputStream getSound(String noteName) {
+			if (!notes.containsKey(noteName)) {
+				try {
+					FileInputStream fos = new FileInputStream(new File("Resource/Audio/Piano/" + noteName + ".wav"));
 
-			switch (noteName) {
-				case "C_0" :
-				case "C#0" :
-				case "D_0" :
-				case "D#0" :
-				case "E_0" :
-				case "F_0" :
-				case "F#0" :
-				case "G_0" :
-				case "G#0" :
-				case "A_0" :
-				case "A#0" :
-				case "B_0" :
-				case "C_1" :
-				case "C#1" :
-				case "D_1" :
-				case "D#1" :
-				case "E_1" :
-					if (!notes.containsKey(noteName)) {
-						try {
-							FileInputStream fos = new FileInputStream(new File("Resource/Audio/Piano/" + noteName + ".wav"));
-
-							// Cut header
-							fos.skip(44);
-							notes.put(noteName, fos);
-						} catch (Exception e) {
-							System.out.println("Cannot find audio file");
-							e.printStackTrace();
-						}
-					}
-					return notes.get(noteName);
-
-				default :
-					System.out.println("Wrong note!");
-					return null;
+					// Cut header
+					fos.skip(44);
+					notes.put(noteName, fos);
+				} catch (Exception e) {
+					System.out.println("Cannot find audio file");
+					e.printStackTrace();
+				}
 			}
+			return notes.get(noteName);
 		}
 	}
 
 	private class DrumSound {
+		HashMap<String, FileInputStream> notes;
 
+		DrumSound() {
+			notes = new HashMap<String, FileInputStream>();
+		}
+
+		public FileInputStream getSound(String noteName) {
+			if (!notes.containsKey(noteName)) {
+				try {
+					FileInputStream fos = new FileInputStream(new File("Resource/Audio/Drum/" + noteName + ".wav"));
+
+					// Cut header
+					fos.skip(44);
+					notes.put(noteName, fos);
+				} catch (Exception e) {
+					System.out.println("Cannot find audio file");
+					e.printStackTrace();
+				}
+			}
+			return notes.get(noteName);
+		}
 	}
 
 	private class GuitarSound {

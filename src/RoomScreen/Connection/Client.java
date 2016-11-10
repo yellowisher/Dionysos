@@ -82,7 +82,6 @@ public class Client extends Thread {
 	}
 
 	public void sendMessage(String msg) {
-		//Recording
 		out.println(msg);
 	}
 
@@ -156,24 +155,15 @@ public class Client extends Thread {
 		});
 	}
 
-	/**
-	 * Prompt for and return the desired screen name.
-	 */
 	private String getNick() {
 		System.out.print("CALLED");
 		return JOptionPane.showInputDialog(frame, "Choose a screen name:", "Screen name selection", JOptionPane.PLAIN_MESSAGE);
 	}
 
-	/**
-	 * Connects to the server then enters the processing loop.
-	 */
-
 	public void run() {
 		try {
-			System.out.println("Client Running");
-
 			// Make connection and initialize streams
-			System.out.println("Client try to connect to " + info.getIp() + ":" + info.getPort());
+			System.out.println("Client : Client try to connect to " + info.getIp() + ":" + info.getPort());
 			Socket socket = new Socket(info.getIp(), info.getPort());
 
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -183,7 +173,6 @@ public class Client extends Thread {
 
 			while (true) {
 				String line = in.readLine();
-				System.out.println("GET " + line);
 
 				if (line.startsWith("FULL")) {
 					socket.close();
@@ -201,8 +190,8 @@ public class Client extends Thread {
 				String line = in.readLine();
 
 				if (line.startsWith("SUBMITNAME")) {
-					
-					while(true) {
+
+					while (true) {
 						name = getNick(); // id input msg.
 						if (name == null || name.equals("")) continue;
 						break;
@@ -230,17 +219,20 @@ public class Client extends Thread {
 					userList.setModel(listModel);
 				}
 				else {
+					if (frame.isRecording) {
+						frame.recorder.record(line);
+					}
 					String note = line.substring(3, 6);
 
 					switch (line.charAt(0)) {
 						case 'P' :
 							//if recording
-							if(line.charAt(1)=='D')pm.play("Piano", note);
+							if (line.charAt(1) == 'D') pm.play("Piano", note);
 							break;
 						case 'G' :
 						case 'D' :
-							
-							if(line.charAt(1)=='H')pm.play("Drum", note);
+
+							if (line.charAt(1) == 'H') pm.play("Drum", note);
 					}
 				}
 			}

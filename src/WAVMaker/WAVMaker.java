@@ -27,8 +27,9 @@ public class WAVMaker {
 	int dataLength;
 	byte[] dataBytes;
 
+	HashMap<String, byte[]> noteMap;
+
 	FileInputStream history;
-	HashMap<String, Integer> noteMap;
 	SoundHolder soundHolder;
 
 	private int readTime() throws IOException {
@@ -58,8 +59,8 @@ public class WAVMaker {
 
 	public WAVMaker(FileInputStream stream) {
 		history = stream;
-		noteMap = new HashMap<String, Integer>();
 		soundHolder = new SoundHolder();
+		noteMap = new HashMap<String, byte[]>();
 
 		try {
 			int duration = readTime();
@@ -73,16 +74,19 @@ public class WAVMaker {
 	}
 
 	private byte[] getSound(Character type, String noteName) {
-		FileInputStream origSrc = soundHolder.getSound(type, noteName);
+		if (noteMap.containsKey(type + noteName)) return noteMap.get(type + noteName);
 
+		FileInputStream origSrc = soundHolder.getSound(type, noteName);
 		try {
 			int length = origSrc.available();
 			byte[] copy = new byte[length];
 			origSrc.read(copy);
+			noteMap.put(type + noteName, copy);
 			return copy;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		System.out.println("ERROR: WAVMaker returns null");
 		return null;
 	}
 
@@ -102,41 +106,19 @@ public class WAVMaker {
 					// And if key is up earlier than its(note) play time, fade out
 					// it.
 					case 'P' :
-						switch (msg.charAt(1)) {
-
-							// If piano key is up, fade out note according to key
-							// up/down time
-							case 'U' :
-								if (noteMap.containsKey(note)) {
-									byte[] origNote = getSound(msg.charAt(0), note);
-									int keyDownTime = noteMap.get(note);
-									noteMap.remove(note);
-									byte[] newNote = fadeOut(origNote, time - keyDownTime);
-									write(newNote, keyDownTime);
-								}
-								noteMap.remove(note);
-								break;
-
-							// If piano key is down, put it into map with current time
-							case 'D' :
-								noteMap.put(note, time);
-								break;
+						if (msg.charAt(1) == 'D') {
+							write(getSound(msg.charAt(0), note), time);
 						}
 						break;
 
 					// Case of Drum
 					case 'D' :
-
-						// Case of Guitar
+						write(getSound(msg.charAt(0), note), time);
+						break;
+					// Case of Guitar
 					case 'G' :
 				}
 			}
-
-			// Write unmerged notes of piano
-			for (String noteName : noteMap.keySet()) {
-				write(getSound('P', noteName), noteMap.get(noteName));
-			}
-			noteMap.clear();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -168,35 +150,30 @@ public class WAVMaker {
 			short addi_1 = (short) ((data[i + 1] & 0xff) << 8);
 			addi_0 |= addi_1;
 
-			orig_0 += addi_0;
+			//orig_0 += addi_0;
+			float sample0f = orig_0 / 32768.0f;
+			float sample1f = addi_0 / 32768.0f;
+			float mixed = sample0f + sample1f * 0.8f;
+
+			if (mixed > 0.7f) {
+				System.out.println("HIGH");
+				mixed = 0.7f;
+			}
+			else if (mixed < -0.7f) {
+				System.out.println("LOW");
+				mixed = -0.7f;
+			}
+
+			orig_0 = (short) (mixed * 32768.0f);
+
 			dataBytes[start + i] = (byte) orig_0;
 			dataBytes[start + i + 1] = (byte) (orig_0 >> 8);
 		}
 	}
 
-	// Fade out given note
-	private byte[] fadeOut(byte[] note, int fadeStart) {
-		int start = toIndex(fadeStart);
-		if (start + FADE_TIME > note.length) return note;
-
-		for (int i = 0; i < FADE_TIME; i += 2) {
-			short orig_0 = (short) (note[start + i] & 0xff);
-			short orig_1 = (short) ((note[start + i + 1] & 0xff) << 8);
-			orig_0 |= orig_1;
-
-			orig_0 *= (float) (FADE_TIME - i) / FADE_TIME;
-
-			note[start + i] = (byte) orig_0;
-			note[start + i + 1] = (byte) (orig_0 >> 8);
-		}
-		byte[] newNote = new byte[start + FADE_TIME];
-		System.arraycopy(note, 0, newNote, 0, start + FADE_TIME);
-		return newNote;
-	}
-
-	public void save() {
+	public void save(String name) {
 		try {
-			DataOutputStream dos = new DataOutputStream(new FileOutputStream("Output.wav"));
+			DataOutputStream dos = new DataOutputStream(new FileOutputStream(name));
 
 			byte[] header;
 			WAVHeader headerMaker = new WAVHeader(dataLength);
@@ -212,11 +189,5 @@ public class WAVMaker {
 			// error during write a file
 			e.printStackTrace();
 		}
-	}
-
-	public static void main(String[] args) throws Exception {
-		WAVMaker wavMaker = new WAVMaker(new FileInputStream(new File("TEST.txt")));
-		wavMaker.createWAV();
-		wavMaker.save();
 	}
 }

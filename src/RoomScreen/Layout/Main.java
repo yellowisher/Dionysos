@@ -6,14 +6,21 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.swing.text.Style;
+import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.StyledDocument;
@@ -21,8 +28,12 @@ import javax.swing.text.StyledDocument;
 import RoomScreen.Connection.Client;
 import RoomScreen.Connection.ConnectInfo;
 import RoomScreen.Connection.Server;
+import WAVMaker.WAVMaker;
 
 import org.bitlet.weupnp.GatewayDevice;
+
+import Recorder.Recorder;
+
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
@@ -40,11 +51,15 @@ public class Main extends JPanel {
 	private Client client;
 	private JPanel focusDest;
 	private StyledDocument document;
+
+	public boolean isRecording;
+	public Recorder recorder;
+	private JFileChooser fileChooser;
 	/**
 	 * Creates new form Main2
 	 */
 	public Main() {
-		
+
 		msgArea = new JTextPane();
 		document = (StyledDocument) msgArea.getDocument();
 
@@ -55,6 +70,11 @@ public class Main extends JPanel {
 		look_feel();
 		initComponents();
 		addPanel();
+
+		isRecording = false;
+		fileChooser = new JFileChooser();
+		fileChooser.setFileFilter(new FileNameExtensionFilter("wav", "wav"));
+		fileChooser.setMultiSelectionEnabled(false);
 
 		jpInstru.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
@@ -76,7 +96,7 @@ public class Main extends JPanel {
 		}
 
 		System.out.println(rows);
-		
+
 		document = (StyledDocument) msgArea.getDocument();
 		if (type != null) document.insertString(document.getLength(), str, document.getStyle("BLUE"));
 		else document.insertString(document.getLength(), str, null);
@@ -124,6 +144,7 @@ public class Main extends JPanel {
 
 		recordBtn.setText("Record");
 		recordBtn.setName(""); // NOI18N
+
 		recordBtn.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				recordBtnActionPerformed(evt);
@@ -134,7 +155,12 @@ public class Main extends JPanel {
 
 		historyBtn.setText("History");
 
-		replayBtn.setText("Replay");
+		replayBtn.setText("To Wav");
+		replayBtn.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				wavBtnActionPerformed(evt);
+			}
+		});
 
 		time.setText("Time : 00 : 05");
 
@@ -185,9 +211,8 @@ public class Main extends JPanel {
 
 		jScrollPane2.setViewportView(msgArea);
 		//jScrollPane2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		
+
 		sendBtn.setText("Send");
-		//Custom
 		jScrollPane1.setViewportView(userList);
 
 		javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -263,7 +288,38 @@ public class Main extends JPanel {
 	}
 
 	private void recordBtnActionPerformed(java.awt.event.ActionEvent evt) {
-		// TODO add your handling code here:
+		if (isRecording) {
+			// Finish recording
+			isRecording = false;
+			recordBtn.setText("Record");
+			recorder.stop();
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss", Locale.KOREA);
+			Date date = new Date();
+			recorder.saveAs("History/" + formatter.format(date) + ".txt");
+
+			try {
+				WAVMaker maker = new WAVMaker(new FileInputStream("History/" + formatter.format(date) + ".txt"));
+				maker.createWAV();
+				if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+					maker.save(fileChooser.getSelectedFile().toString() + ".wav");
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			recorder = null;
+		}
+		else {
+			// Start recording
+			isRecording = true;
+			recordBtn.setText("[STOP]");
+
+			recorder = new Recorder();
+		}
+	}
+
+	private void wavBtnActionPerformed(java.awt.event.ActionEvent evt) {
+
 	}
 
 	/**

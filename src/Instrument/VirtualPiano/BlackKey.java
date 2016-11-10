@@ -21,8 +21,6 @@ class BlackKey extends Key {
 		if (isPressed) return 0;
 		isPressed = true;
 		setIcon(keyDownImage);
-		// Play clip here
-//		play();
 		return 1;
 	}
 
@@ -30,7 +28,6 @@ class BlackKey extends Key {
 	void keyUp() {
 		isPressed = false;
 		setIcon(keyUpImage);
-		// Fade out clip here
 	}
 	
 	void resizeImage(){

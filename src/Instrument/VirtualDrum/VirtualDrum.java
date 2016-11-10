@@ -10,15 +10,14 @@ import javax.swing.JPanel;
 import RoomScreen.Connection.Client;
 import RoomScreen.Layout.Main;
 
-
-public class VirtualDrum extends JPanel implements KeyListener{
+public class VirtualDrum extends JPanel implements KeyListener {
 	JPanel parent;
 	Client client;
 	Main main;
 	final int N_DRUM = 8;
 	DrumKey[] drums = new DrumKey[N_DRUM];
 	HashMap<Integer, Key> keyMap = new HashMap<Integer, Key>();
-	public VirtualDrum(JPanel parent,Main main){
+	public VirtualDrum(JPanel parent, Main main) {
 		this.parent = parent;
 		this.main = main;
 		initComponents();
@@ -38,61 +37,51 @@ public class VirtualDrum extends JPanel implements KeyListener{
 		addKeyListener(this);
 		setFocusable(true);
 	}
-	
-	 private void initComponents() {
 
-	        jLabel1 = new javax.swing.JLabel();
+	private void initComponents() {
 
-	        setBackground(new java.awt.Color(21, 21, 21));
-	        setSize(920,350);
-	        ImageIcon icon = new ImageIcon("Resource/Image/drum/drum_Panel.jpg");
-	        System.out.println("积己肯丰");
-	        jLabel1.setIcon(icon);
-	        jLabel1.setOpaque(true);
-	        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-	        this.setLayout(layout);
-	        layout.setHorizontalGroup(
-	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	            .addGroup(layout.createSequentialGroup()
-	                .addGap(216, 216, 216)
-	                .addComponent(jLabel1)
-	                .addContainerGap(223, Short.MAX_VALUE))
-	        );
-	        layout.setVerticalGroup(
-	            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	            .addGroup(layout.createSequentialGroup()
-	                .addContainerGap()
-	                .addComponent(jLabel1)
-	                .addContainerGap(20, Short.MAX_VALUE))
-	        );
-	    }// </editor-fold>                        
+		jLabel1 = new javax.swing.JLabel();
 
-	 @Override
-		public void keyPressed(KeyEvent e) {
-			Key key = keyMap.get(e.getKeyCode());
-			if (key == null) return;
+		setBackground(new java.awt.Color(21, 21, 21));
+		setSize(920, 350);
+		ImageIcon icon = new ImageIcon("Resource/Image/drum/drum_Panel.jpg");
+		System.out.println("积己肯丰");
+		jLabel1.setIcon(icon);
+		jLabel1.setOpaque(true);
+		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+		this.setLayout(layout);
+		layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(layout.createSequentialGroup().addGap(216, 216, 216).addComponent(jLabel1).addContainerGap(223, Short.MAX_VALUE)));
+		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addGroup(layout.createSequentialGroup().addContainerGap().addComponent(jLabel1).addContainerGap(20, Short.MAX_VALUE)));
+	}// </editor-fold>                        
 
-			int check = key.keyDown();
+	@Override
+	public void keyPressed(KeyEvent e) {
+		Key key = keyMap.get(e.getKeyCode());
+		if (key == null) return;
+
+		int check = key.keyDown();
 		if (check == 1) {
 			this.client = main.getClient();
 			client.sendMessage("DH_" + key.getNoteName());
 		}
-			//INSTRU,CODE
-		}
+		//INSTRU,CODE
+	}
 
-		@Override
-		public void keyReleased(KeyEvent e) {
-			Key key = keyMap.get(e.getKeyCode());
-			if (key == null) return;
+	@Override
+	public void keyReleased(KeyEvent e) {
+		Key key = keyMap.get(e.getKeyCode());
+		if (key == null) return;
 
-			key.keyUp();
-		}
+		key.keyUp();
+	}
 
-		@Override
-		public void keyTyped(KeyEvent e) {
+	@Override
+	public void keyTyped(KeyEvent e) {
 
-		}
+	}
 
-	    // Variables declaration - do not modify                     
-	    private javax.swing.JLabel jLabel1;
+	// Variables declaration - do not modify                     
+	private javax.swing.JLabel jLabel1;
 }

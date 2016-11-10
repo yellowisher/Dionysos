@@ -37,10 +37,6 @@ public class Server extends Thread {
 		port = info.port;
 
 		lobbyWriter = new ObjectOutputStream(socket.getOutputStream());
-
-		System.out.println("The chat server is running.");
-
-		System.out.println("Listening port : " + info.port);
 		numUser = 0;
 	}
 
@@ -74,7 +70,7 @@ public class Server extends Thread {
 		private boolean leftCuzFull = false;
 
 		public Handler(Socket socket) {
-			System.out.println("Client with port " + socket.getPort() + " try to connect...");
+			System.out.println("Server : Client with port " + socket.getPort() + " try to connect...");
 			this.socket = socket;
 		}
 
@@ -92,12 +88,10 @@ public class Server extends Thread {
 					return;
 				}
 				out.println("ENTER");
-				System.out.println("ENTER sent! current user: " + (numUser + 1));
 
 				String line;
 				while (true) {
 					line = in.readLine();
-					if (line != null) System.out.println("Server recv something!");
 					if (line != null && line.startsWith("OK")) {
 						numUser++;
 						lobbyWriter.writeObject(new String("JOIN"));

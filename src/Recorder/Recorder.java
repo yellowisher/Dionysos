@@ -22,7 +22,8 @@ public class Recorder {
 		buffer += str + "\r\n";
 	}
 
-	public void stop(int finishTime) {
+	public void stop() {
+		long finishTime = System.currentTimeMillis() - startTime;
 		buffer = format.format(finishTime) + "\r\n" + buffer;
 	}
 

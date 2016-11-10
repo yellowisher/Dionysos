@@ -36,8 +36,6 @@ public class Piano {
 					break escape;
 			}
 		}
-		recorder.stop((int) (System.currentTimeMillis() - startTime));
-		recorder.saveAs("WAHAA.txt");
 
 	}
 

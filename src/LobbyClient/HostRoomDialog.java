@@ -141,6 +141,7 @@ public class HostRoomDialog extends JDialog {
 								}
 								else if (!device.addPortMapping(pt, pt, device.getLocalAddress().getHostAddress(), "TCP", "Dionysos!")) {
 									System.out.println("FAILED!");
+									listener.close();
 									return;
 								}
 								parent.roomPanel.createRoom(info, device, listener, socket);

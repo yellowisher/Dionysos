@@ -118,7 +118,6 @@ public class ClientRoomDialog extends JDialog {
 
 					if (map.isEmpty()) {
 						// no room
-						
 					}
 					else {
 						for (RoomInfo roomInfo : map.values()) {
