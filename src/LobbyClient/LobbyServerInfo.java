@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 import javax.swing.JOptionPane;
 
 import MainScreen.MainFrame;
-import RoomScreen.Layout.Main;
+import RoomScreen.Layout.RoomPanel;
 
 public class LobbyServerInfo {
 	private static final String hostName = "m1rukim.iptime.org";

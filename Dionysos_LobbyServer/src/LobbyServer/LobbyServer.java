@@ -7,6 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.ClientInfoStatus;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import RoomInfo.RoomInfo;
 
@@ -25,7 +27,6 @@ public class LobbyServer {
 			new RequestListener(roomMap).start();
 
 			while (true) {
-
 				// Start host listening thread
 				new HostHandler(hostListener.accept()).start();
 			}
@@ -39,6 +40,7 @@ public class LobbyServer {
 		private Socket socket;
 		private ObjectInputStream reader;
 		private PrintWriter writer;
+		private Timer disconChecker;
 
 		HostHandler(Socket socket) {
 			this.socket = socket;
@@ -63,31 +65,61 @@ public class LobbyServer {
 					roomMap.put(room.roomName, room);
 				}
 
+				disconChecker = new Timer();
+				DisconChecker checker = new DisconChecker();
+				disconChecker.schedule(checker, RoomInfo.PING_DELAY, RoomInfo.PING_DELAY);
+
 				String msg;
 				reader = new ObjectInputStream(socket.getInputStream());
 				while (true) {
 					msg = (String) reader.readObject();
 					if (msg != null) {
-						System.out.println("Client in" + room.roomName + " has " + msg);
+						checker.reset();
 
-						if (msg.equals("JOIN")) {
-							room.numUser++;
+						if (msg.equals("Ping")) {
+							System.out.println("Ping from " + room.roomName);
 						}
-						else if (msg.equals("LEFT")) {
-							if (--room.numUser < 0) room.numUser = 0;
+						else {
+							System.out.println("Client in " + room.roomName + " has " + msg);
+							if (msg.equals("JOIN")) {
+								room.numUser++;
+							}
+							else if (msg.equals("LEFT")) {
+								room.numUser--;
+							}
 						}
 					}
 				}
 			} catch (Exception e) {
-				//e.printStackTrace();
-			} finally {
+				disconChecker.cancel();
 				try {
 					System.out.println("A room is closed");
-					socket.close();
 					roomMap.remove(room.roomName);
-				} catch (IOException e) {
-					//e.printStackTrace();
+					socket.close();
+				} catch (IOException e1) {
+
 				}
+			}
+		}
+
+		class DisconChecker extends TimerTask {
+			int count = 0;
+
+			@Override
+			public void run() {
+				System.out.println((count + 1));
+
+				if (++count == 4) {
+					try {
+						socket.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			void reset() {
+				count = 0;
 			}
 		}
 	}

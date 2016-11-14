@@ -4,10 +4,11 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
+import Instrument.Key;
+
 class BlackKey extends Key {
 	static final int WIDTH = 20;
 	static final int HEIGHT = 185;
-	//39,185
 	static ImageIcon keyUpImage;
 	static ImageIcon keyDownImage;
 	
@@ -17,15 +18,15 @@ class BlackKey extends Key {
 	}
 
 	@Override
-	int keyDown() {
-		if (isPressed) return 0;
+	public boolean keyDown() {
+		if (isPressed) return false;
 		isPressed = true;
 		setIcon(keyDownImage);
-		return 1;
+		return true;
 	}
 
 	@Override
-	void keyUp() {
+	public void keyUp() {
 		isPressed = false;
 		setIcon(keyUpImage);
 	}

@@ -8,20 +8,20 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import RoomScreen.Connection.Client;
-import RoomScreen.Layout.Main;
+import RoomScreen.Layout.RoomPanel;
+import Instrument.Key;
 
 public class VirtualDrum extends JPanel implements KeyListener {
-	JPanel parent;
 	Client client;
-	Main main;
-	final int N_DRUM = 8;
-	DrumKey[] drums = new DrumKey[N_DRUM];
+	final int NUM_DRUM_KEY = 8;
+	DrumKey[] drums = new DrumKey[NUM_DRUM_KEY];
 	HashMap<Integer, Key> keyMap = new HashMap<Integer, Key>();
-	public VirtualDrum(JPanel parent, Main main) {
-		this.parent = parent;
-		this.main = main;
+
+	public VirtualDrum(Client client) {
+		this.client = client;
 		initComponents();
-		for (int i = 0; i < N_DRUM; i++) {
+		
+		for (int i = 0; i < NUM_DRUM_KEY; i++) {
 			drums[i] = new DrumKey();
 		}
 		//@preOn
@@ -53,19 +53,16 @@ public class VirtualDrum extends JPanel implements KeyListener {
 				.addGroup(layout.createSequentialGroup().addGap(216, 216, 216).addComponent(jLabel1).addContainerGap(223, Short.MAX_VALUE)));
 		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(layout.createSequentialGroup().addContainerGap().addComponent(jLabel1).addContainerGap(20, Short.MAX_VALUE)));
-	}// </editor-fold>                        
+	}                 
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		Key key = keyMap.get(e.getKeyCode());
 		if (key == null) return;
 
-		int check = key.keyDown();
-		if (check == 1) {
-			this.client = main.getClient();
+		if (key.keyDown()) {
 			client.sendMessage("DH_" + key.getNoteName());
 		}
-		//INSTRU,CODE
 	}
 
 	@Override

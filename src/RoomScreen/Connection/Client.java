@@ -18,6 +18,7 @@ import javax.swing.JTextPane;
 import Instrument.VirtualDrum.VirtualDrum;
 import Instrument.VirtualPiano.VirtualPiano;
 import MainScreen.MainFrame;
+import RoomInfo.RoomInfo;
 import RoomScreen.Layout.*;
 import RoomScreen.Manager.*;
 
@@ -28,13 +29,13 @@ public class Client extends Thread {
 	private static final int STATE_DRUM = 3;
 	int currentState;
 
-	BufferedReader in;
+	RoomInfo info;
+	BufferedReader in = null;
 	PrintWriter out;
-	Main frame;
-	ConnectInfo info;
+	RoomPanel frame;
 	JTextField textField;
-
 	JTextPane messageArea;
+	Client instance;
 
 	JList<String> userList;
 	DefaultListModel<String> listModel = new DefaultListModel<String>();
@@ -42,10 +43,12 @@ public class Client extends Thread {
 	PlayManager pm = new PlayManager();
 
 	JButton pianoBtn, guitarBtn, drumBtn;
+	ConnDialog dialog;
 
-	public Client(Main f, ConnectInfo info) {
+	public Client(RoomInfo info) {
 		currentState = STATE_NOTHING;
-		this.frame = f;
+		instance = this;
+		frame = RoomPanel.instance;
 		this.info = info;
 		getChoiceContent();
 		initChoiceContent();
@@ -59,7 +62,7 @@ public class Client extends Thread {
 		frame.getJpInstru().removeAll();
 		// Add Listeners
 		textField.addActionListener(new ActionListener() {
-			/**
+			/*
 			 * Responds to pressing the enter key in the textfield by sending
 			 * the contents of the text field to the server. Then clear the text
 			 * area in preparation for the next message.
@@ -94,7 +97,6 @@ public class Client extends Thread {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
 				if (currentState == STATE_PIANO) return;
 				currentState = STATE_PIANO;
 
@@ -105,7 +107,7 @@ public class Client extends Thread {
 
 				JPanel jp = (JPanel) frame.getJpInstru();
 				jp.removeAll();
-				VirtualPiano vpPanel = new VirtualPiano(jp, frame);
+				VirtualPiano vpPanel = new VirtualPiano(instance);
 				jp.add(vpPanel);
 				vpPanel.requestFocus();
 				frame.setFocusDest(vpPanel);
@@ -116,7 +118,6 @@ public class Client extends Thread {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
 				if (currentState == STATE_GUITAR) return;
 				currentState = STATE_GUITAR;
 
@@ -135,7 +136,6 @@ public class Client extends Thread {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
 				if (currentState == STATE_DRUM) return;
 				currentState = STATE_DRUM;
 
@@ -146,7 +146,7 @@ public class Client extends Thread {
 
 				JPanel jp = (JPanel) frame.getJpInstru();
 				jp.removeAll();
-				VirtualDrum vdPanel = new VirtualDrum(jp, frame);
+				VirtualDrum vdPanel = new VirtualDrum(instance);
 				jp.add(vdPanel);
 				vdPanel.requestFocus();
 				frame.setFocusDest(vdPanel);
@@ -162,8 +162,12 @@ public class Client extends Thread {
 	public void run() {
 		try {
 			// Make connection and initialize streams
-			System.out.println("Client : Client try to connect to " + info.getIp() + ":" + info.getPort());
-			Socket socket = new Socket(info.getIp(), info.getPort());
+			System.out.println("Client : Client try to connect to " + info.IPAdress + ":" + info.port);
+
+			dialog = new ConnDialog(MainFrame.instance);
+			Socket socket = new Socket(info.IPAdress, info.port);
+			dialog.dispose();
+			//Socket socket = new Socket(info.getIp(), info.getPort());
 
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
@@ -237,6 +241,13 @@ public class Client extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 			MainFrame.instance.changePanel("Title");
+			if (name == null) {
+				dialog.dispose();
+				JOptionPane.showMessageDialog(frame, "Cannot connect to host!", "Connection failed", JOptionPane.ERROR_MESSAGE);
+			}
+			else {
+				JOptionPane.showMessageDialog(frame, "Diconnected from host", "Disconnected", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 }

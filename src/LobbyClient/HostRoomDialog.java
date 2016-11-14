@@ -16,21 +16,18 @@ import javax.naming.ldap.ExtendedRequest;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 
 import MainScreen.MainFrame;
 import RoomInfo.RoomInfo;
-import RoomScreen.Connection.ConnectInfo;
-import RoomScreen.Layout.Main;
+import RoomScreen.Connection.Client;
+import RoomScreen.Connection.Server;
 
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
-import org.bitlet.weupnp.PortMappingEntry;
 
 public class HostRoomDialog extends JDialog {
 	Socket socket;
@@ -60,7 +57,7 @@ public class HostRoomDialog extends JDialog {
 		JPanel p2 = new JPanel();
 		p2.add(l2);
 		p2.add(passwordField);
-		localOnly = new JCheckBox("Local only");
+		localOnly = new JCheckBox("LAN Only");
 		localOnly.setFont(new Font("Arial", Font.PLAIN, 20));
 		p2.add(localOnly);
 
@@ -93,6 +90,7 @@ public class HostRoomDialog extends JDialog {
 			RoomInfo roomInfo = new RoomInfo(roomName, password);
 			boolean isLocal = localOnly.isSelected();
 
+			// If room type is local, tell lobby server its local address
 			if (isLocal) {
 				try {
 					roomInfo.IPAdress = InetAddress.getLocalHost().getHostAddress();
@@ -109,9 +107,9 @@ public class HostRoomDialog extends JDialog {
 				ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
 				ServerSocket listener = new ServerSocket(0);
-				int pt = listener.getLocalPort();
+				int port = listener.getLocalPort();
+				roomInfo.port = port;
 
-				roomInfo.port = pt;
 				oos.writeObject(roomInfo);
 
 				while (true) {
@@ -127,30 +125,33 @@ public class HostRoomDialog extends JDialog {
 							String[] externalAddr = line.split("/");
 							System.out.println("External : " + externalAddr[0] + ":" + externalAddr[1]);
 
-							ConnectInfo info = new ConnectInfo(externalAddr[0], roomInfo.port, ConnectInfo.CREATE);
+							// Host connect via local address (faster)
+							GatewayDevice device = null;
 
 							if (!isLocal) {
 								// Setup UPNP
 								GatewayDiscover discover = new GatewayDiscover();
 								discover.discover();
-								GatewayDevice device = discover.getValidGateway();
-								PortMappingEntry portMapping = new PortMappingEntry();
+								device = discover.getValidGateway();
+								
+								// We have to check for already mapped?
+								//PortMappingEntry portMapping = new PortMappingEntry();
 
 								if (device == null) {
-									System.out.println("NULL!");
+									System.out.println("Cannot find gateway router!");
 								}
-								else if (!device.addPortMapping(pt, pt, device.getLocalAddress().getHostAddress(), "TCP", "Dionysos!")) {
-									System.out.println("FAILED!");
+								else if (!device.addPortMapping(port, port, device.getLocalAddress().getHostAddress(), "TCP", "Dionysos!")) {
+									System.out.println("Mapping failed!");
 									listener.close();
 									return;
 								}
-								parent.roomPanel.createRoom(info, device, listener, socket);
 							}
-							else parent.roomPanel.createRoom(info, null, listener, socket);
 
+							new Server(device, listener, socket).start();
 							parent.changePanel("Room");
 							dispose();
-							parent.roomPanel.joinRoom(info);
+							roomInfo.IPAdress = InetAddress.getLocalHost().getHostAddress();
+							new Client(roomInfo).start();
 						}
 						return;
 					}

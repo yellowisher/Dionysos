@@ -32,8 +32,8 @@ import javax.swing.JScrollPane;
 
 import MainScreen.MainFrame;
 import RoomInfo.RoomInfo;
-import RoomScreen.Connection.ConnectInfo;
-import RoomScreen.Layout.Main;
+import RoomScreen.Connection.Client;
+import RoomScreen.Layout.RoomPanel;
 
 public class ClientRoomDialog extends JDialog {
 	DefaultListModel<RoomInfo> listModel;
@@ -64,24 +64,23 @@ public class ClientRoomDialog extends JDialog {
 				if (e.getClickCount() == 2 && !e.isConsumed()) {
 					e.consume();
 					RoomInfo roomInfo = (RoomInfo) roomList.getSelectedValue();
-					
+
 					if (roomInfo != null) {
 						if (!roomInfo.password.equals("")) {
 							String input = JOptionPane.showInputDialog(frame, "Input password :", "Password required", JOptionPane.PLAIN_MESSAGE);
-							if(!input.equals(roomInfo.password)) {
+							if (!input.equals(roomInfo.password)) {
 								JOptionPane.showMessageDialog(frame, "Wrong password! Try again", "Wrong password", JOptionPane.ERROR_MESSAGE);
 								return;
 							}
-						}
+						}	
 
-						ConnectInfo info = new ConnectInfo(roomInfo.IPAdress, roomInfo.port, ConnectInfo.JOIN);
 						parent.changePanel("Room");
 						dispose();
-						parent.roomPanel.joinRoom(info);								
+						new Client(roomInfo).start();
 					}
 				}
-        	}
-        });
+			}
+		});
 		if (refresh()) setVisible(true);
 	}
 
@@ -91,6 +90,7 @@ public class ClientRoomDialog extends JDialog {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean refresh() {
 		listModel.clear();
 		HashMap<String, RoomInfo> map = null;

@@ -39,21 +39,4 @@ public class Recorder {
 			e.printStackTrace();
 		}
 	}
-
-	public static void main(String[] args) {
-		long currentTime = System.currentTimeMillis();
-		Recorder recorder = new Recorder();
-
-		try {
-			Thread.sleep(2343);
-			recorder.record("Piano,G");
-			Thread.sleep(2222);
-			recorder.record("Drum,A");
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		recorder.saveAs("WAHAHA.txt");
-		System.out.println("done!");
-	}
-
 }

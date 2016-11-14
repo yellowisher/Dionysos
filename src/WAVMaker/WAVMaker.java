@@ -1,21 +1,12 @@
 package WAVMaker;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Scanner;
-
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
-
-import org.omg.CORBA.PRIVATE_MEMBER;
 
 public class WAVMaker {
 	final static int FADE_TIME = 12000;
@@ -30,7 +21,6 @@ public class WAVMaker {
 	HashMap<String, byte[]> noteMap;
 
 	FileInputStream history;
-	SoundHolder soundHolder;
 
 	private int readTime() throws IOException {
 		byte[] time = new byte[9];
@@ -59,7 +49,6 @@ public class WAVMaker {
 
 	public WAVMaker(FileInputStream stream) {
 		history = stream;
-		soundHolder = new SoundHolder();
 		noteMap = new HashMap<String, byte[]>();
 
 		try {
@@ -77,17 +66,30 @@ public class WAVMaker {
 	private byte[] getSound(Character type, String noteName) {
 		if (noteMap.containsKey(type + noteName)) return noteMap.get(type + noteName);
 
-		FileInputStream origSrc = soundHolder.getSound(type, noteName);
-		try {
-			int length = origSrc.available();
-			byte[] copy = new byte[length];
-			origSrc.read(copy);
-			noteMap.put(type + noteName, copy);
-			return copy;
-		} catch (IOException e) {
-			e.printStackTrace();
+		String inst = null;
+		switch (type) {
+			case 'P' :
+				inst = "Piano/";
+				break;
+			case 'D' :
+				inst = "Drum/";
+				break;
+			case 'G' :
+				inst = "Guitar/";
+				break;
 		}
-		System.out.println("ERROR: WAVMaker returns null");
+
+		try {
+			FileInputStream fis = new FileInputStream(new File("Resource/Audio/" + inst + noteName + ".wav"));
+			fis.skip(44);
+			byte[] copy = new byte[fis.available()];
+			fis.read(copy);
+			noteMap.put(type + noteName, copy);
+			fis.close();
+			return copy;
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 		return null;
 	}
 
@@ -101,11 +103,6 @@ public class WAVMaker {
 				switch (msg.charAt(0)) {
 
 					// Case of Piano
-					// Main idea : when key(note) is down, store it to map.
-					// When key is up, if that key(note) exists in map, pop it out and
-					// write on empty file.
-					// And if key is up earlier than its(note) play time, fade out
-					// it.
 					case 'P' :
 						if (msg.charAt(1) == 'D') {
 							write(getSound(msg.charAt(0), note), time);
@@ -131,16 +128,10 @@ public class WAVMaker {
 
 		for (int i = 0; i < data.length; i += 2) {
 
-			// For debug
-			if (start + i + 1 >= dataLength) {
-				System.out.println("Index error in write() function");
-				return;
-			}
+			if (start + i + 1 >= dataLength) return;
 
-			// In default setting, our WAV file uses 16bits(2bytes) for sample
-			// size.
-			// And it is stored in little endian. So get each bytes, convert to
-			// big
+			// In default setting, our WAV file uses 16bits(2bytes) for sample size.
+			// And it is stored in little endian. So get each bytes, convert to big
 			// endian, calculate(add) and convert back to little endian,
 			// store them to WAV file.
 			short orig_0 = (short) (dataBytes[start + i] & 0xff);
@@ -151,7 +142,7 @@ public class WAVMaker {
 			short addi_1 = (short) ((data[i + 1] & 0xff) << 8);
 			addi_0 |= addi_1;
 
-			//orig_0 += addi_0;
+			// Some clipping to remove noise; Thanks stackOverflow!
 			float sample0f = orig_0 / 32768.0f;
 			float sample1f = addi_0 / 32768.0f;
 			float mixed = sample0f + sample1f * 0.8f;
@@ -187,7 +178,7 @@ public class WAVMaker {
 			// cannot create a file
 			e.printStackTrace();
 		} catch (IOException e) {
-			// error during write a file
+			// error during writing a file
 			e.printStackTrace();
 		}
 	}

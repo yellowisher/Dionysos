@@ -6,14 +6,14 @@ import java.awt.Toolkit;
 import javax.swing.JFrame;
 
 import LobbyClient.LobbyServerInfo;
-import RoomScreen.Layout.Main;
+import RoomScreen.Layout.RoomPanel;
 
 public class MainFrame extends JFrame {
 	static final int WIDTH = 920;
 	static final int HEIGHT = 756;
 
 	CardLayout panelHolder = new CardLayout();
-	public Main roomPanel = new Main();
+	public RoomPanel roomPanel = new RoomPanel();
 	
 	public static MainFrame instance;
 

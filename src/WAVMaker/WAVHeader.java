@@ -20,7 +20,7 @@ public class WAVHeader {
 		this.numChannel = 1;
 	}
 
-	// Second version of constructor for further update
+	// Second version of constructor for further update (will we?)
 	public WAVHeader(int dataLength, int sampleRate, int bitPerSample, int numChannel) {
 		header = new byte[44];
 		this.dataLength = dataLength;
@@ -30,7 +30,6 @@ public class WAVHeader {
 	}
 
 	public byte[] getHeader() {
-
 		// Fills WAV header for given information.
 		// standard for WAV header -> http://soundfile.sapp.org/doc/WaveFormat/
 

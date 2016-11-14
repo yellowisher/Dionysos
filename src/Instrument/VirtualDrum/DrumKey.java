@@ -1,25 +1,22 @@
 package Instrument.VirtualDrum;
 
-public class DrumKey extends Key{
+import Instrument.Key;
+
+public class DrumKey extends Key {
 
 	public DrumKey() {
 		super();
 	}
 
 	@Override
-	int keyDown() {
-		if (isPressed) return 0;
+	public boolean keyDown() {
+		if (isPressed) return false;
 		isPressed = true;
-//		setIcon(keyDownImage);
-		// Play clip here
-//		play();
-		return 1;
+		return true;
 	}
 
 	@Override
-	void keyUp() {
+	public void keyUp() {
 		isPressed = false;
-//		setIcon(keyUpImage);
-		// Fade out clip here
 	}
 }
