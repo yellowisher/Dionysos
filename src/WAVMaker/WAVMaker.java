@@ -142,19 +142,13 @@ public class WAVMaker {
 			short addi_1 = (short) ((data[i + 1] & 0xff) << 8);
 			addi_0 |= addi_1;
 
-			// Some clipping to remove noise; Thanks stackOverflow!
+			// Remove clippings; Thanks stackOverflow!
 			float sample0f = orig_0 / 32768.0f;
 			float sample1f = addi_0 / 32768.0f;
 			float mixed = sample0f + sample1f * 0.8f;
 
-			if (mixed > 0.7f) {
-				System.out.println("HIGH");
-				mixed = 0.7f;
-			}
-			else if (mixed < -0.7f) {
-				System.out.println("LOW");
-				mixed = -0.7f;
-			}
+			if (mixed > 0.7f) mixed = 0.7f;
+			else if (mixed < -0.7f) mixed = -0.7f;
 
 			orig_0 = (short) (mixed * 32768.0f);
 

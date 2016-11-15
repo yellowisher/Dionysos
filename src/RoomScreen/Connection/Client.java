@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 import Instrument.VirtualDrum.VirtualDrum;
+import Instrument.VirtualGuitar.VirtualGuitar;
 import Instrument.VirtualPiano.VirtualPiano;
 import MainScreen.MainFrame;
 import RoomInfo.RoomInfo;
@@ -127,8 +128,11 @@ public class Client extends Thread {
 				out.println("CHOICE Guitar");
 
 				JPanel jp = (JPanel) frame.getJpInstru();
-				//jp.removeAll();
-
+				jp.removeAll();
+				VirtualGuitar vpPanel = new VirtualGuitar(instance);
+				jp.add(vpPanel);
+				vpPanel.requestFocus();
+				frame.setFocusDest(vpPanel);
 				frame.repaint();
 			}
 		});
@@ -232,8 +236,11 @@ public class Client extends Thread {
 							if (line.charAt(1) == 'D') pm.play("Piano", note);
 							break;
 						case 'G' :
+							if (line.charAt(1) == 'H') pm.play("Guitar", note);
+							break;
 						case 'D' :
 							if (line.charAt(1) == 'H') pm.play("Drum", note);
+							break;
 					}
 				}
 			}

@@ -25,14 +25,14 @@ public class VirtualDrum extends JPanel implements KeyListener {
 			drums[i] = new DrumKey();
 		}
 		//@preOn
-				keyMap.put(KeyEvent.VK_N,			drums[0].setNoteName("SNR"));
-				keyMap.put(KeyEvent.VK_F,			drums[1].setNoteName("RID"));
-				keyMap.put(KeyEvent.VK_J,			drums[2].setNoteName("MTM"));
-				keyMap.put(KeyEvent.VK_G,			drums[3].setNoteName("LTM"));
-				keyMap.put(KeyEvent.VK_SPACE,		drums[4].setNoteName("KIK"));
-				keyMap.put(KeyEvent.VK_V,			drums[5].setNoteName("HIH"));
-				keyMap.put(KeyEvent.VK_B,			drums[6].setNoteName("FTM"));
-				keyMap.put(KeyEvent.VK_K,			drums[7].setNoteName("CRS"));
+		keyMap.put(KeyEvent.VK_N,			drums[0].setNoteName("SNR"));
+		keyMap.put(KeyEvent.VK_F,			drums[1].setNoteName("RID"));
+		keyMap.put(KeyEvent.VK_J,			drums[2].setNoteName("MTM"));
+		keyMap.put(KeyEvent.VK_G,			drums[3].setNoteName("LTM"));
+		keyMap.put(KeyEvent.VK_SPACE,		drums[4].setNoteName("KIK"));
+		keyMap.put(KeyEvent.VK_V,			drums[5].setNoteName("HIH"));
+		keyMap.put(KeyEvent.VK_B,			drums[6].setNoteName("FTM"));
+		keyMap.put(KeyEvent.VK_K,			drums[7].setNoteName("CRS"));
 		//@preOff
 		addKeyListener(this);
 		setFocusable(true);

@@ -2,9 +2,11 @@ package RoomScreen.Layout;
 
 import java.awt.Image;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 public class Choice extends JPanel {
 	JPanel parent;
@@ -75,7 +77,7 @@ public class Choice extends JPanel {
 								.addComponent(guitarBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(pianoBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 						.addContainerGap()));
-	}                   
+	}
 	public JButton getPianoBtn() {
 		return pianoBtn;
 	}
