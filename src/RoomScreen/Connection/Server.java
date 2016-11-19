@@ -70,7 +70,7 @@ public class Server extends Thread {
 		public Handler(Socket socket) {
 			System.out.println("Server : Client with port " + socket.getPort() + " try to connect...");
 			this.socket = socket;
-			
+
 			// Start reporting; if it fails 4 times, lobby server remove its information
 			// from its list.
 			surviveReporter = new Timer();
@@ -146,22 +146,14 @@ public class Server extends Thread {
 					}
 				}
 			} catch (RoomIsFullException e) {
-				try {
-					socket.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				// Exception for denial join; user didn't join yet
 			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
+				// Exception for lost connection
 				numUser--;
-				try {
-					lobbyWriter.writeObject("LEFT");
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				if (out != null) {
-					writers.remove(out);
+
+				if (name != null) {
+					System.out.println("REMOVE");
+					writers.remove(name);
 
 					for (PrintWriter writer : writers.values()) {
 						writer.println("BROADCAST " + "[Notice] [" + name + "] exited the room.");
@@ -172,10 +164,17 @@ public class Server extends Thread {
 						}
 					}
 				}
+
+				try {
+					lobbyWriter.writeObject("LEFT");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			} finally {
 				try {
 					socket.close();
 				} catch (IOException e) {
-
+					e.printStackTrace();
 				}
 			}
 		}

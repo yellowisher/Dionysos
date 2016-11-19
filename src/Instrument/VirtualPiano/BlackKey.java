@@ -14,7 +14,8 @@ class BlackKey extends Key {
 	
 	public BlackKey() {
 		super();
-		resizeImage();
+		if (keyUpImage == null) resizeImage();
+		this.setIcon(keyUpImage);
 	}
 
 	@Override
@@ -41,7 +42,6 @@ class BlackKey extends Key {
 		Image image2 =icon2.getImage();
 		Image newImg2 = image2.getScaledInstance(WIDTH, HEIGHT, java.awt.Image.SCALE_SMOOTH);
 		keyDownImage = new ImageIcon(newImg2);
-		this.setIcon(keyUpImage);
 	}
 }
 

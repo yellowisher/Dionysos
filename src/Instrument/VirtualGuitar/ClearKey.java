@@ -2,9 +2,9 @@ package Instrument.VirtualGuitar;
 
 import Instrument.Key;
 
-public class NodeClearKey extends Key{
+public class ClearKey extends Key{
 
-	public NodeClearKey() {
+	public ClearKey() {
 		super();
 	}
 

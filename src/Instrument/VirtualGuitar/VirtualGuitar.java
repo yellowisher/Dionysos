@@ -26,6 +26,7 @@ public class VirtualGuitar extends JPanel implements KeyListener {
 	HashMap<Integer, Key> keyMap = new HashMap<Integer, Key>();
 	ArrayList<GuitarKey> storedKey;
 	ArrayList<GuitarKey> pressedKey;
+	boolean lastWasHit = false;
 
 	public VirtualGuitar(Client client) {
 		this.client = client;
@@ -55,7 +56,7 @@ public class VirtualGuitar extends JPanel implements KeyListener {
 			}
 		}
 
-		NodeClearKey Back = new NodeClearKey();
+		ClearKey Back = new ClearKey();
 		HitKey Hit = new HitKey();
 
 		//@preOn
@@ -134,12 +135,14 @@ public class VirtualGuitar extends JPanel implements KeyListener {
 					aKey.keyDown();
 					pressedKey.add((GuitarKey) aKey);
 					client.sendMessage("GH_" + aKey.getNoteName().substring(0, 3));
+					lastWasHit = true;
 				}
 			}
 			else if (keyName.startsWith("CANCEL")) {
 				storedKey.clear();
 			}
 			else if (keyName.startsWith("c")) {
+				lastWasHit = false;
 				if (e.isControlDown()) {
 					if (!storedKey.isEmpty()) ((CombineKey) key).setStoredKey(storedKey);
 				}
@@ -148,7 +151,9 @@ public class VirtualGuitar extends JPanel implements KeyListener {
 				}
 			}
 			else {
+				if (lastWasHit) storedKey.clear();
 				if (!storedKey.contains(key)) storedKey.add((GuitarKey) key);
+				lastWasHit = false;
 			}
 		}
 	}
