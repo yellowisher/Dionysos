@@ -35,3 +35,7 @@ low_tom		LTM
 mid_tom		MTM
 rider		RID
 snare		SNR
+
+
+[GUITAR]
+Same as piano

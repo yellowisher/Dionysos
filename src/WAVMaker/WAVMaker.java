@@ -113,8 +113,11 @@ public class WAVMaker {
 					case 'D' :
 						write(getSound(msg.charAt(0), note), time);
 						break;
+
 					// Case of Guitar
 					case 'G' :
+						write(getSound(msg.charAt(0), note), time);
+						break;
 				}
 			}
 		} catch (IOException e) {
