@@ -14,6 +14,7 @@ import java.util.TimerTask;
 import org.bitlet.weupnp.GatewayDevice;
 import org.xml.sax.SAXException;
 
+import LobbyClient.LANListener;
 import RoomInfo.RoomInfo;
 
 public class Server extends Thread {
@@ -28,16 +29,19 @@ public class Server extends Thread {
 	private static ObjectOutputStream lobbyWriter;
 
 	private GatewayDevice device;
+	private LANListener lanListener;
 	private int port;
 
-	public Server(GatewayDevice device, ServerSocket listener, Socket socket) throws Exception {
+	public Server(GatewayDevice device, ServerSocket listener, Socket socket, LANListener lanListener) throws Exception {
 		this.device = device;
 		this.listener = listener;
+		this.lanListener = lanListener;
 
-		lobbySocket = socket;
-		lobbyWriter = new ObjectOutputStream(socket.getOutputStream());
-		port = socket.getLocalPort();
-
+		if (lanListener == null) {
+			lobbySocket = socket;
+			lobbyWriter = new ObjectOutputStream(socket.getOutputStream());
+			port = socket.getLocalPort();
+		}
 		numUser = 0;
 	}
 
@@ -46,14 +50,16 @@ public class Server extends Thread {
 		System.out.println("Room server start running : " + listener.getLocalPort());
 		try {
 			while (true) {
-				new Handler(listener.accept()).start();
+				new Handler(listener.accept(), lanListener).start();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				if (device != null) device.deletePortMapping(port, "TCP");
-				listener.close();
+
+				if (lanListener != null) listener.close();
+				else lanListener.endListen();
 			} catch (IOException | SAXException e) {
 				e.printStackTrace();
 			}
@@ -66,15 +72,19 @@ public class Server extends Thread {
 		private BufferedReader in;
 		private PrintWriter out;
 		private Timer surviveReporter;
+		private LANListener lanListener;
 
-		public Handler(Socket socket) {
+		public Handler(Socket socket, LANListener lanListener) {
 			System.out.println("Server : Client with port " + socket.getPort() + " try to connect...");
 			this.socket = socket;
+			this.lanListener = lanListener;
 
 			// Start reporting; if it fails 4 times, lobby server remove its information
 			// from its list.
-			surviveReporter = new Timer();
-			surviveReporter.schedule(new Reporter(), RoomInfo.PING_DELAY, RoomInfo.PING_DELAY);
+			if (lanListener == null) {
+				surviveReporter = new Timer();
+				surviveReporter.schedule(new Reporter(), RoomInfo.PING_DELAY, RoomInfo.PING_DELAY);
+			}
 		}
 
 		public void run() {
@@ -96,7 +106,8 @@ public class Server extends Thread {
 					line = in.readLine();
 					if (line != null && line.startsWith("OK")) {
 						numUser++;
-						lobbyWriter.writeObject(new String("JOIN"));
+						if (lanListener == null) lobbyWriter.writeObject(new String("JOIN"));
+						else lanListener.clientJoin();
 						break;
 					}
 				}
@@ -166,7 +177,8 @@ public class Server extends Thread {
 				}
 
 				try {
-					lobbyWriter.writeObject("LEFT");
+					if (lanListener == null) lobbyWriter.writeObject("LEFT");
+					else lanListener.clientLeft();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}

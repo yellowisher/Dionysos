@@ -8,11 +8,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
-import javax.naming.ldap.ExtendedRequest;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -90,50 +89,47 @@ public class HostRoomDialog extends JDialog {
 			RoomInfo roomInfo = new RoomInfo(roomName, password);
 			boolean isLocal = localOnly.isSelected();
 
-			// If room type is local, tell lobby server its local address
-			if (isLocal) {
-				try {
-					roomInfo.IPAdress = InetAddress.getLocalHost().getHostAddress();
-					System.out.println(roomInfo.IPAdress);
-				} catch (UnknownHostException e1) {
-					e1.printStackTrace();
-				}
-			}
-
 			try {
-				socket = new Socket(LobbyServerInfo.IPAddress, LobbyServerInfo.hostPort);
-
-				BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+				GatewayDevice device = null;
+				GatewayDiscover discover = null;
+				LANListener lanListener = null;
 
 				ServerSocket listener = new ServerSocket(0);
 				int port = listener.getLocalPort();
 				roomInfo.port = port;
 
-				oos.writeObject(roomInfo);
+				if (isLocal) {
+					roomInfo.IPAdress = InetAddress.getLocalHost().getHostAddress();
+					lanListener = new LANListener(roomInfo);
+					lanListener.start();
+				}
+				else {
+					LobbyServerInfo.init();
+					socket = new Socket();
+					socket.connect(new InetSocketAddress(LobbyServerInfo.IPAddress, LobbyServerInfo.hostPort), 1500);
+					BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
-				while (true) {
-					String line = reader.readLine();
-					if (line != null) {
+					oos.writeObject(roomInfo);
 
-						if (line.equals("EXIST")) {
-							JOptionPane.showMessageDialog(parent, "Already exist name!", "Name exist!", JOptionPane.ERROR_MESSAGE);
-							listener.close();
-							return;
-						}
-						else {
-							String[] externalAddr = line.split("/");
-							System.out.println("External : " + externalAddr[0] + ":" + externalAddr[1]);
+					while (true) {
+						String line = reader.readLine();
+						if (line != null) {
 
-							// Host connect via local address (faster)
-							GatewayDevice device = null;
+							if (line.equals("EXIST")) {
+								JOptionPane.showMessageDialog(parent, "Already exist name!", "Name exist!", JOptionPane.ERROR_MESSAGE);
+								listener.close();
+								return;
+							}
+							else {
+								String[] externalAddr = line.split("/");
+								System.out.println("External : " + externalAddr[0] + ":" + externalAddr[1]);
 
-							if (!isLocal) {
 								// Setup UPNP
-								GatewayDiscover discover = new GatewayDiscover();
+								discover = new GatewayDiscover();
 								discover.discover();
 								device = discover.getValidGateway();
-								
+
 								// We have to check for already mapped?
 								//PortMappingEntry portMapping = new PortMappingEntry();
 
@@ -145,19 +141,22 @@ public class HostRoomDialog extends JDialog {
 									listener.close();
 									return;
 								}
+								break;
 							}
-
-							new Server(device, listener, socket).start();
-							parent.changePanel("Room");
-							dispose();
-							roomInfo.IPAdress = InetAddress.getLocalHost().getHostAddress();
-							new Client(roomInfo).start();
 						}
-						return;
 					}
 				}
+
+				new Server(device, listener, socket, lanListener).start();
+				parent.changePanel("Room");
+				dispose();
+
+				// Host connect via local address (faster)
+				roomInfo.IPAdress = InetAddress.getLocalHost().getHostAddress();
+				new Client(roomInfo).start();
 			} catch (Exception e1) {
-				e1.printStackTrace();
+				dispose();
+				JOptionPane.showMessageDialog(MainFrame.instance, "Cannot connect to lobby server!", "Connection error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

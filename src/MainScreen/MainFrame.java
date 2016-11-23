@@ -41,8 +41,6 @@ public class MainFrame extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		LobbyServerInfo.init();
-
 		MainFrame mainFrame = new MainFrame();
 		mainFrame.panelHolder.next(mainFrame.getContentPane());
 		mainFrame.setVisible(true);

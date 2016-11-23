@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -23,6 +24,7 @@ import LobbyClient.HostRoomDialog;
 public class TitlePanel extends JPanel {
 
 	MainFrame frame;
+	JCheckBox lanCheckBox = new JCheckBox("LAN");
 
 	TitlePanel(int frameWidth, int frameHeight, MainFrame frame) {
 		this.setLayout(null);
@@ -55,13 +57,18 @@ public class TitlePanel extends JPanel {
 		gc.gridy = 1;
 		joinRoom.add(joinRoomBtn, gc);
 
+		JPanel textPanel = new JPanel();
+		gc.gridx = 1;
+		gc.gridy = 2;
+		joinRoom.add(textPanel, gc);
+
 		// Join room text
 		JLabel joinRoomText = new JLabel("Jump into friend's room!");
 		joinRoomText.setFont(joinRoomText.getFont().deriveFont(16f));
 		joinRoomText.setHorizontalAlignment(SwingConstants.CENTER);
-		gc.gridx = 1;
-		gc.gridy = 2;
-		joinRoom.add(joinRoomText, gc);
+		
+		textPanel.add(joinRoomText);
+		textPanel.add(lanCheckBox);
 
 		// Panel for create room
 		JPanel createRoom = new JPanel();
@@ -97,7 +104,7 @@ public class TitlePanel extends JPanel {
 			String type = e.getActionCommand();
 
 			if (type.equals("Join Room")) {
-				new ClientRoomDialog(frame);
+				new ClientRoomDialog(frame, lanCheckBox.isSelected());
 				// TODO : Try connect here
 			}
 			else if (type.equals("Create Room")) {

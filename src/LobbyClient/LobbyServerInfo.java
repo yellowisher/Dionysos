@@ -16,13 +16,12 @@ public class LobbyServerInfo {
 	public static final int hostPort = 9392;
 	public static final int clientPort = 9322;
 
-	public static void init() {
-		try {
-			IPAddress = InetAddress.getByName(hostName);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(MainFrame.instance, "Cannot connect to lobby server!", "Connection error", JOptionPane.ERROR_MESSAGE);
-			MainFrame.instance.dispose();
-		}
+	private static boolean inited = false;
+
+	public static void init() throws UnknownHostException {
+		if (inited) return;
+
+		IPAddress = InetAddress.getByName(hostName);
+		inited = true;
 	}
 }
