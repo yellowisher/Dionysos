@@ -4,8 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.ServerSocket;
@@ -15,6 +21,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import javax.swing.text.Style;
+import javax.swing.GroupLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -31,6 +38,7 @@ import WAVMaker.WAVMaker;
 
 import org.bitlet.weupnp.GatewayDevice;
 
+import MainScreen.MainFrame;
 import Recorder.Recorder;
 
 import javax.swing.text.StyleConstants;
@@ -61,7 +69,7 @@ public class RoomPanel extends JPanel {
 	 */
 	public RoomPanel() {
 		instance = this;
-		
+
 		msgArea = new JTextPane();
 		document = (StyledDocument) msgArea.getDocument();
 
@@ -96,12 +104,15 @@ public class RoomPanel extends JPanel {
 	 */
 	private int rows = 0;
 	public void appendStr(String str, String type) throws BadLocationException {
-		if (rows > 13) {
-			document.remove(0, document.getText(0, document.getLength()).indexOf("\n") + 1);
-		}
-		else {
-			rows++;
-		}
+		/*
+		 * if (rows > 13) { document.remove(0, document.getText(0,
+		 * document.getLength()).indexOf("\n") + 1); } else { rows++; } document
+		 * = (StyledDocument) msgArea.getDocument(); if (type != null)
+		 * document.insertString(document.getLength(), str,
+		 * document.getStyle("BLUE")); else
+		 * document.insertString(document.getLength(), str, null);
+		 */
+
 		document = (StyledDocument) msgArea.getDocument();
 		if (type != null) document.insertString(document.getLength(), str, document.getStyle("BLUE"));
 		else document.insertString(document.getLength(), str, null);
@@ -169,17 +180,17 @@ public class RoomPanel extends JPanel {
 
 		javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
 		jPanel2.setLayout(jPanel2Layout);
-		jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(jPanel2Layout.createSequentialGroup().addContainerGap()
-						.addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-								.addGroup(jPanel2Layout.createSequentialGroup().addComponent(recordBtn)
-										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addComponent(replayBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(historyBtn)
-										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addComponent(exitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
-								.addComponent(location).addComponent(time))
-						.addContainerGap(71, Short.MAX_VALUE)));
+		jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(jPanel2Layout
+				.createSequentialGroup().addContainerGap()
+				.addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+						.addGroup(jPanel2Layout.createSequentialGroup().addComponent(recordBtn, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+								.addComponent(replayBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(historyBtn)
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+								.addComponent(exitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+						.addComponent(location).addComponent(time))
+				.addContainerGap(71, Short.MAX_VALUE)));
 		jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(jPanel2Layout.createSequentialGroup().addContainerGap()
 						.addGroup(jPanel2Layout
@@ -213,22 +224,21 @@ public class RoomPanel extends JPanel {
 		sendBtn.setText("Send");
 		jScrollPane1.setViewportView(userList);
 
+		//TODO: BUG FIX
 		javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
 		jPanel4.setLayout(jPanel4Layout);
-		jPanel4Layout.setHorizontalGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+
+		jPanel4Layout.setHorizontalGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
 				.addGroup(jPanel4Layout.createSequentialGroup().addContainerGap()
-						.addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jScrollPane2)
-								.addGroup(jPanel4Layout.createSequentialGroup()
-										.addComponent(txtField, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addComponent(sendBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addGap(0, 0, Short.MAX_VALUE))
-								.addComponent(jScrollPane1))
+						.addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jScrollPane2, 250, 250, 250)
+								.addGroup(jPanel4Layout.createSequentialGroup().addComponent(txtField, 188, 188, 188)
+										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(sendBtn, 61, 61, 61).addGap(0, 0, 0))
+								.addComponent(jScrollPane1, 250, 250, 250))
 						.addContainerGap()));
-		jPanel4Layout.setVerticalGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(jPanel4Layout.createSequentialGroup()
-						.addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(jScrollPane2)
+
+		jPanel4Layout.setVerticalGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+				.addGroup(jPanel4Layout.createSequentialGroup().addComponent(jScrollPane1, 78, 78, 78)
+						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(jScrollPane2, 280, 280, 280)
 						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 						.addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(txtField,
 								javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -246,18 +256,18 @@ public class RoomPanel extends JPanel {
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
 		setLayout(layout);
 		layout.setHorizontalGroup(
-				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
 						.addGroup(layout.createSequentialGroup()
-								.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(layout.createSequentialGroup()
+								.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false).addGroup(layout.createSequentialGroup()
 										.addComponent(jpLogo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
 												javax.swing.GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-										.addComponent(jpChoice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+										.addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 399, GroupLayout.PREFERRED_SIZE))
+										.addComponent(jpChoice, GroupLayout.PREFERRED_SIZE, 619, GroupLayout.PREFERRED_SIZE))
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(jPanel4,
 										javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
 						.addComponent(jpInstru, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE));
 		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(layout.createSequentialGroup()
 						.addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false).addGroup(layout
@@ -360,7 +370,7 @@ public class RoomPanel extends JPanel {
 	}
 
 	// Variables declaration - do not modify                     
-	private javax.swing.JButton exitBtn;
+	public javax.swing.JButton exitBtn;
 	private javax.swing.JButton historyBtn;
 	private javax.swing.JPanel jPanel2;
 	private javax.swing.JPanel jPanel4;
@@ -372,7 +382,7 @@ public class RoomPanel extends JPanel {
 	private javax.swing.JPanel jpLogo;
 	private javax.swing.JLabel location;
 
-	private javax.swing.JButton recordBtn;
+	public javax.swing.JButton recordBtn;
 	private javax.swing.JButton replayBtn;
 	private javax.swing.JButton sendBtn;
 	private javax.swing.JLabel time;

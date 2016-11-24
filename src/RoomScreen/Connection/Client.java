@@ -1,5 +1,6 @@
 package RoomScreen.Connection;
 
+import java.awt.Window.Type;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -7,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -14,6 +17,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 import Instrument.VirtualDrum.VirtualDrum;
 import Instrument.VirtualGuitar.VirtualGuitar;
@@ -93,7 +98,15 @@ public class Client extends Thread {
 		return name;
 	}
 
+	private LineBorder selected = (LineBorder) BorderFactory.createLineBorder(new java.awt.Color(51, 255, 51), 3);
+	private EmptyBorder notSelected = (EmptyBorder) BorderFactory.createEmptyBorder(3, 3, 3, 3);
+
 	private void initChoiceContent() {
+		pianoBtn.setBorder(notSelected);
+		guitarBtn.setBorder(notSelected);
+		drumBtn.setBorder(notSelected);
+		frame.repaint();
+
 		pianoBtn.addActionListener(new ActionListener() {
 
 			@Override
@@ -101,9 +114,9 @@ public class Client extends Thread {
 				if (currentState == STATE_PIANO) return;
 				currentState = STATE_PIANO;
 
-				pianoBtn.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 255, 51), 3));
-				guitarBtn.setBorder(null);
-				drumBtn.setBorder(null);
+				pianoBtn.setBorder(selected);
+				guitarBtn.setBorder(notSelected);
+				drumBtn.setBorder(notSelected);
 				out.println("CHOICE Piano");
 
 				JPanel jp = (JPanel) frame.getJpInstru();
@@ -122,9 +135,9 @@ public class Client extends Thread {
 				if (currentState == STATE_GUITAR) return;
 				currentState = STATE_GUITAR;
 
-				guitarBtn.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 255, 51), 3));
-				pianoBtn.setBorder(null);
-				drumBtn.setBorder(null);
+				guitarBtn.setBorder(selected);
+				pianoBtn.setBorder(notSelected);
+				drumBtn.setBorder(notSelected);
 				out.println("CHOICE Guitar");
 
 				JPanel jp = (JPanel) frame.getJpInstru();
@@ -143,9 +156,9 @@ public class Client extends Thread {
 				if (currentState == STATE_DRUM) return;
 				currentState = STATE_DRUM;
 
-				drumBtn.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 255, 51), 3));
-				pianoBtn.setBorder(null);
-				guitarBtn.setBorder(null);
+				drumBtn.setBorder(selected);
+				pianoBtn.setBorder(notSelected);
+				guitarBtn.setBorder(notSelected);
 				out.println("CHOICE Drum");
 
 				JPanel jp = (JPanel) frame.getJpInstru();
@@ -192,22 +205,23 @@ public class Client extends Thread {
 					break;
 				}
 			}
-
+			
 			while (true) {
 				String line = in.readLine();
-
+				
 				if (line.startsWith("SUBMITNAME")) {
-
+					
 					while (true) {
 						name = getNick(); // id input msg.
 						if (name == null || name.equals("")) continue;
 						break;
 					}
 					out.println(name);
+					
 				}
 				else if (line.startsWith("NAMEACCEPTED")) {
 					textField.setEditable(true);
-
+					
 				}
 				else if (line.startsWith("BROADCAST")) {
 					//server broadcasts room information.

@@ -123,7 +123,7 @@ public class VirtualGuitar extends JPanel implements KeyListener {
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e) {		
 		Key key = keyMap.get(e.getKeyCode());
 		if (key == null) return;
 

@@ -21,35 +21,34 @@ public class VirtualDrum extends JPanel implements KeyListener {
 
 	public VirtualDrum(Client client) {
 		this.client = client;
-
+		
 		setBackground(new Color(125, 187, 23));
-		setPreferredSize(new Dimension(920, 350));
 		setSize(new Dimension(920, 350));
 		setLayout(null);
 
 		drumKeys[0] = new DrumKey(DrumKey.TYPE_METAL, 151, 152);
-		drumKeys[0].setBounds(186, 8, 166, 167);
+		drumKeys[0].setBounds(186, 0, 166, 167);
 
 		drumKeys[1] = new DrumKey(DrumKey.TYPE_METAL, 133, 133);
-		drumKeys[1].setBounds(186, 126, 146, 146);
+		drumKeys[1].setBounds(186, 118, 146, 146);
 
 		drumKeys[2] = new DrumKey(DrumKey.TYPE_METAL, 158, 158);
-		drumKeys[2].setBounds(549, 2, 174, 174);
+		drumKeys[2].setBounds(549, 0, 174, 174);
 
 		drumKeys[3] = new DrumKey(DrumKey.TYPE_NORMAL, 139, 140);
-		drumKeys[3].setBounds(470, 8, 153, 154);
+		drumKeys[3].setBounds(470, 0, 153, 154);
 
 		drumKeys[4] = new DrumKey(DrumKey.TYPE_NORMAL, 125, 126);
-		drumKeys[4].setBounds(294, 8, 137, 138);
+		drumKeys[4].setBounds(294, 0, 137, 138);
 
 		drumKeys[5] = new DrumKey(DrumKey.TYPE_NORMAL, 157, 158);
-		drumKeys[5].setBounds(246, 135, 172, 173);
+		drumKeys[5].setBounds(246, 127, 172, 173);
 
 		drumKeys[6] = new DrumKey(DrumKey.TYPE_NORMAL, 167, 169);
-		drumKeys[6].setBounds(532, 124, 183, 185);
+		drumKeys[6].setBounds(532, 114, 183, 185);
 
 		drumKeys[7] = new DrumKey(DrumKey.TYPE_KICK, -1, -1);
-		drumKeys[7].setBounds(337, 33, 222, 187);
+		drumKeys[7].setBounds(337, 25, 222, 187);
 
 		for (int i = 0; i < NUM_DRUM_KEY; i++)
 			add(drumKeys[i]);

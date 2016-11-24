@@ -35,6 +35,7 @@ public class HostRoomDialog extends JDialog {
 	JCheckBox localOnly;
 	Font font = new Font("Arial", Font.BOLD, 32);
 
+	// Constructor setting UI
 	public HostRoomDialog(MainFrame parent) {
 		super(parent, true);
 
@@ -98,12 +99,18 @@ public class HostRoomDialog extends JDialog {
 				int port = listener.getLocalPort();
 				roomInfo.port = port;
 
+				/*
+				 * If user created LAN room; start UDP listening server that
+				 * listen for local user request. In online mode, lobby server
+				 * do this, but in LAN mode, there is no lobby server so host have to listen
+				 */
 				if (isLocal) {
 					roomInfo.IPAdress = InetAddress.getLocalHost().getHostAddress();
 					lanListener = new LANListener(roomInfo);
 					lanListener.start();
 				}
 				else {
+					// If user created online room; try to port mapping by UPNP
 					LobbyServerInfo.init();
 					socket = new Socket();
 					socket.connect(new InetSocketAddress(LobbyServerInfo.IPAddress, LobbyServerInfo.hostPort), 1500);
@@ -112,36 +119,34 @@ public class HostRoomDialog extends JDialog {
 
 					oos.writeObject(roomInfo);
 
-					while (true) {
-						String line = reader.readLine();
-						if (line != null) {
+					String line = reader.readLine();
+					if (line != null) {
 
-							if (line.equals("EXIST")) {
-								JOptionPane.showMessageDialog(parent, "Already exist name!", "Name exist!", JOptionPane.ERROR_MESSAGE);
+						// Online mode also have to check for duplicated name
+						if (line.equals("EXIST")) {
+							JOptionPane.showMessageDialog(parent, "Already exist name!", "Name exist!", JOptionPane.ERROR_MESSAGE);
+							listener.close();
+							return;
+						}
+						else {
+							String[] externalAddr = line.split("/");
+							System.out.println("External : " + externalAddr[0] + ":" + externalAddr[1]);
+
+							// Setup UPNP
+							discover = new GatewayDiscover();
+							discover.discover();
+							device = discover.getValidGateway();
+
+							// We have to check for already mapped?
+							//PortMappingEntry portMapping = new PortMappingEntry();
+
+							if (device == null) {
+								System.out.println("Cannot find gateway router!");
+							}
+							else if (!device.addPortMapping(port, port, device.getLocalAddress().getHostAddress(), "TCP", "Dionysos!")) {
+								System.out.println("Mapping failed!");
 								listener.close();
 								return;
-							}
-							else {
-								String[] externalAddr = line.split("/");
-								System.out.println("External : " + externalAddr[0] + ":" + externalAddr[1]);
-
-								// Setup UPNP
-								discover = new GatewayDiscover();
-								discover.discover();
-								device = discover.getValidGateway();
-
-								// We have to check for already mapped?
-								//PortMappingEntry portMapping = new PortMappingEntry();
-
-								if (device == null) {
-									System.out.println("Cannot find gateway router!");
-								}
-								else if (!device.addPortMapping(port, port, device.getLocalAddress().getHostAddress(), "TCP", "Dionysos!")) {
-									System.out.println("Mapping failed!");
-									listener.close();
-									return;
-								}
-								break;
 							}
 						}
 					}

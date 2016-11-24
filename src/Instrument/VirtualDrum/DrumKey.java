@@ -21,17 +21,20 @@ public class DrumKey extends Key {
 
 	private ImageIcon keyUpImage;
 	private ImageIcon keyDownImage;
+	private int xDelta;
 
-	public DrumKey(int type, int height, int width) {
+	public DrumKey(int type, int width, int height) {
 		super();
 
 		if (height == -1) {
 			keyUpImage = new ImageIcon(images[type]);
 			keyDownImage = new ImageIcon(images[type].getScaledInstance(222, 187, Image.SCALE_SMOOTH));
+			xDelta = 10;
 		}
 		else {
 			keyUpImage = new ImageIcon(images[type].getScaledInstance(width, height, Image.SCALE_SMOOTH));
 			keyDownImage = new ImageIcon(images[type].getScaledInstance((int) (width * 1.1), (int) (height * 1.1), Image.SCALE_SMOOTH));
+			xDelta = ((int) (width * 0.1)) / 2;
 		}
 		setIcon(keyUpImage);
 	}
@@ -40,6 +43,7 @@ public class DrumKey extends Key {
 	public boolean keyDown() {
 		if (isPressed) return false;
 		isPressed = true;
+		setLocation((int) (getLocation().getX() - xDelta), (int) (getLocation().getY()));
 		setIcon(keyDownImage);
 		return true;
 	}
@@ -47,6 +51,7 @@ public class DrumKey extends Key {
 	@Override
 	public void keyUp() {
 		isPressed = false;
+		setLocation((int) (getLocation().getX() + xDelta), (int) (getLocation().getY()));
 		setIcon(keyUpImage);
 	}
 }

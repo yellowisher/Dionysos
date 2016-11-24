@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 
-import LobbyClient.LobbyServerInfo;
 import RoomScreen.Layout.RoomPanel;
 
 public class MainFrame extends JFrame {

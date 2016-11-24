@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.sql.ClientInfoStatus;
 import java.util.HashMap;
 import java.util.Timer;
@@ -40,10 +41,10 @@ public class LobbyServer {
 		private Socket socket;
 		private ObjectInputStream reader;
 		private PrintWriter writer;
-		private Timer disconChecker;
 
-		HostHandler(Socket socket) {
+		HostHandler(Socket socket) throws SocketException {
 			this.socket = socket;
+			socket.setSoTimeout(RoomInfo.PING_DELAY * 4);
 		}
 
 		public void run() {
@@ -60,21 +61,16 @@ public class LobbyServer {
 						return;
 					}
 
-					if (room.IPAdress == null) room.IPAdress = socket.getInetAddress().getHostAddress();
+					room.IPAdress = socket.getInetAddress().getHostAddress();
 					writer.println(room.IPAdress + "/" + socket.getPort());
 					roomMap.put(room.roomName, room);
 				}
-
-				disconChecker = new Timer();
-				DisconChecker checker = new DisconChecker();
-				disconChecker.schedule(checker, RoomInfo.PING_DELAY, RoomInfo.PING_DELAY);
 
 				String msg;
 				reader = new ObjectInputStream(socket.getInputStream());
 				while (true) {
 					msg = (String) reader.readObject();
 					if (msg != null) {
-						checker.reset();
 
 						if (msg.equals("Ping")) {
 							System.out.println("Ping from " + room.roomName);
@@ -91,7 +87,6 @@ public class LobbyServer {
 					}
 				}
 			} catch (Exception e) {
-				disconChecker.cancel();
 				try {
 					System.out.println("A room is closed");
 					roomMap.remove(room.roomName);
@@ -99,27 +94,6 @@ public class LobbyServer {
 				} catch (IOException e1) {
 
 				}
-			}
-		}
-
-		class DisconChecker extends TimerTask {
-			int count = 0;
-
-			@Override
-			public void run() {
-				System.out.println((count + 1));
-
-				if (++count == 4) {
-					try {
-						socket.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-
-			void reset() {
-				count = 0;
 			}
 		}
 	}
