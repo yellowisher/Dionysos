@@ -1,7 +1,9 @@
 package MainScreen;
 
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 
@@ -13,13 +15,18 @@ public class MainFrame extends JFrame {
 
 	CardLayout panelHolder = new CardLayout();
 	public RoomPanel roomPanel = new RoomPanel();
-	
+
 	public static MainFrame instance;
 
 	MainFrame() {
 		instance = this;
 		setTitle("Dionysos");
 		getContentPane().setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+		// Set icon of frame
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Image image = toolkit.getImage("Resource/Image/Icon.png");
+		setIconImage(image);
 
 		// Setting for CardLayout
 		getContentPane().setLayout(panelHolder);

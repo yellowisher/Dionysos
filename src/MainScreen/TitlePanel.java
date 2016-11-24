@@ -35,12 +35,15 @@ public class TitlePanel extends JPanel {
 		int imageHeight = titleImageIcon.getIconHeight();
 		titleImage.setBounds((frameWidth - imageWidth) / 2, 10, imageWidth, imageHeight);
 		add(titleImage);
+		setBackground(new Color(255, 200, 200));
 
 		// Panel for join room
 		JPanel joinRoom = new JPanel();
 		joinRoom.setBounds(0, imageHeight + 90, frameWidth / 2, frameHeight - imageHeight - 90);
-		joinRoom.setBorder(new LineBorder(new Color(247, 145, 0), 2));
+		joinRoom.setBorder(new LineBorder(new Color(247, 145, 0), 4));
 		joinRoom.setLayout(new GridBagLayout());
+		joinRoom.setBackground(new Color(255, 200, 200));
+
 		add(joinRoom);
 
 		GridBagConstraints gc = new GridBagConstraints();
@@ -64,15 +67,17 @@ public class TitlePanel extends JPanel {
 		JLabel joinRoomText = new JLabel("Jump into friend's room!");
 		joinRoomText.setFont(joinRoomText.getFont().deriveFont(16f));
 		joinRoomText.setHorizontalAlignment(SwingConstants.CENTER);
-		
+
+		textPanel.setBackground(new Color(255, 200, 200));
 		textPanel.add(joinRoomText);
 		textPanel.add(lanCheckBox);
 
 		// Panel for create room
 		JPanel createRoom = new JPanel();
 		createRoom.setBounds(frameWidth / 2, imageHeight + 90, frameWidth / 2, frameHeight - imageHeight - 90);
-		createRoom.setBorder(new LineBorder(new Color(247, 145, 0), 2));
+		createRoom.setBorder(new LineBorder(new Color(247, 145, 0), 4));
 		createRoom.setLayout(new GridBagLayout());
+		createRoom.setBackground(new Color(255, 200, 200));
 		add(createRoom);
 
 		// Create room button
