@@ -4,18 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -36,9 +30,6 @@ import RoomScreen.Connection.Client;
 import RoomScreen.Connection.Server;
 import WAVMaker.WAVMaker;
 
-import org.bitlet.weupnp.GatewayDevice;
-
-import MainScreen.MainFrame;
 import Recorder.Recorder;
 
 import javax.swing.text.StyleConstants;
@@ -54,10 +45,11 @@ public class RoomPanel extends JPanel {
 	private JTextPane msgArea;
 
 	public CardLayout instHolder;
-	private Server server;
-	private Client client;
 	private JPanel focusDest;
 	private StyledDocument document;
+	
+	public Client client;
+	public Server server;
 
 	public boolean isRecording;
 	public Recorder recorder;
@@ -96,23 +88,8 @@ public class RoomPanel extends JPanel {
 		focusDest = p;
 	}
 
-	/*
-	 * While removing and creating new instrument panel, the chat text append to
-	 * bottom. To prevent this, rather than scroll chat JTextPane, keep only 13
-	 * rows in JTextPane. Maybe better implementation about chat area or change
-	 * instrument panels to CardLayout?
-	 */
-	private int rows = 0;
+	// Because JTextPane has no append() method, home made version of append()
 	public void appendStr(String str, String type) throws BadLocationException {
-		/*
-		 * if (rows > 13) { document.remove(0, document.getText(0,
-		 * document.getLength()).indexOf("\n") + 1); } else { rows++; } document
-		 * = (StyledDocument) msgArea.getDocument(); if (type != null)
-		 * document.insertString(document.getLength(), str,
-		 * document.getStyle("BLUE")); else
-		 * document.insertString(document.getLength(), str, null);
-		 */
-
 		document = (StyledDocument) msgArea.getDocument();
 		if (type != null) document.insertString(document.getLength(), str, document.getStyle("BLUE"));
 		else document.insertString(document.getLength(), str, null);
@@ -128,8 +105,6 @@ public class RoomPanel extends JPanel {
 		jPanel2 = new javax.swing.JPanel();
 		recordBtn = new javax.swing.JButton();
 		location = new javax.swing.JLabel();
-		historyBtn = new javax.swing.JButton();
-		replayBtn = new javax.swing.JButton();
 		time = new javax.swing.JLabel();
 		exitBtn = new javax.swing.JButton();
 		jpInstru = new javax.swing.JPanel();
@@ -156,6 +131,15 @@ public class RoomPanel extends JPanel {
 
 		recordBtn.setText("Record");
 		recordBtn.setName(""); // NOI18N
+		exitBtn.setText("Exit");
+		location.setText("Location : C:\\Dionysos\\record\\");
+		time.setText("Time : 00 : 05");
+
+		exitBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				exitBtnActionPerformed(evt);
+			}
+		});
 
 		recordBtn.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -163,43 +147,22 @@ public class RoomPanel extends JPanel {
 			}
 		});
 
-		location.setText("Location : C:\\Dionysos\\record\\");
-
-		historyBtn.setText("History");
-
-		replayBtn.setText("To Wav");
-		replayBtn.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				wavBtnActionPerformed(evt);
-			}
-		});
-
-		time.setText("Time : 00 : 05");
-
-		exitBtn.setText("Exit");
-
 		javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
 		jPanel2.setLayout(jPanel2Layout);
 		jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(jPanel2Layout
 				.createSequentialGroup().addContainerGap()
 				.addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 						.addGroup(jPanel2Layout.createSequentialGroup().addComponent(recordBtn, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addComponent(replayBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(historyBtn)
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addComponent(exitBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(exitBtn,
+										javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
 						.addComponent(location).addComponent(time))
 				.addContainerGap(71, Short.MAX_VALUE)));
 		jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(jPanel2Layout.createSequentialGroup().addContainerGap()
-						.addGroup(jPanel2Layout
-								.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-								.addComponent(exitBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE).addGroup(jPanel2Layout
-										.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-										.addComponent(recordBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
-										.addComponent(replayBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(historyBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+						.addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+								.addComponent(exitBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
+								.addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false).addComponent(recordBtn,
+										javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)))
 						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(location).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(time).addContainerGap()));
 
@@ -293,6 +256,10 @@ public class RoomPanel extends JPanel {
 		jpChoice.add(choicePanel);
 	}
 
+	private void exitBtnActionPerformed(java.awt.event.ActionEvent evt) {
+
+	}
+
 	private void recordBtnActionPerformed(java.awt.event.ActionEvent evt) {
 		if (isRecording) {
 			// Finish recording
@@ -323,11 +290,6 @@ public class RoomPanel extends JPanel {
 			recorder = new Recorder();
 		}
 	}
-
-	private void wavBtnActionPerformed(java.awt.event.ActionEvent evt) {
-
-	}
-
 	private void look_feel() {
 		try {
 			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -362,16 +324,12 @@ public class RoomPanel extends JPanel {
 	public JPanel getJpInstru() {
 		return jpInstru;
 	}
-	public Client getClient() {
-		return client;
-	}
 	public void changeInst(String inst) {
 		instHolder.show(jpInstru, inst);
 	}
 
 	// Variables declaration - do not modify                     
 	public javax.swing.JButton exitBtn;
-	private javax.swing.JButton historyBtn;
 	private javax.swing.JPanel jPanel2;
 	private javax.swing.JPanel jPanel4;
 	private javax.swing.JScrollPane jScrollPane1;
@@ -383,7 +341,6 @@ public class RoomPanel extends JPanel {
 	private javax.swing.JLabel location;
 
 	public javax.swing.JButton recordBtn;
-	private javax.swing.JButton replayBtn;
 	private javax.swing.JButton sendBtn;
 	private javax.swing.JLabel time;
 	private javax.swing.JTextField txtField;

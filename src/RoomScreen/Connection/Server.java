@@ -16,6 +16,7 @@ import org.xml.sax.SAXException;
 
 import LobbyClient.LANListener;
 import RoomInfo.RoomInfo;
+import RoomScreen.Layout.RoomPanel;
 
 public class Server extends Thread {
 	private static int numUser;
@@ -36,6 +37,7 @@ public class Server extends Thread {
 		this.device = device;
 		this.listener = listener;
 		this.lanListener = lanListener;
+		RoomPanel.instance.server = this;
 
 		if (lanListener == null) {
 			lobbySocket = socket;
@@ -43,6 +45,10 @@ public class Server extends Thread {
 			port = socket.getLocalPort();
 		}
 		numUser = 0;
+	}
+	
+	public void closeServer() {
+		
 	}
 
 	@Override
@@ -201,6 +207,5 @@ public class Server extends Thread {
 				}
 			}
 		}
-
 	}
 }

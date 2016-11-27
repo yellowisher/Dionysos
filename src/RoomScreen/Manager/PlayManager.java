@@ -20,23 +20,26 @@ public class PlayManager {
 			clip.open(AudioSystem.getAudioInputStream(new File(fileName)));
 			clipMap.put(fileName, clip);
 		}
-		
-		/*  
-		 *  Before playing clip, it must be rewound.
-		 *  But call clip.stop() and clip.flush() sometimes fails to rewind,
-		 *  
-		 *  When I tried to fix this bug, I logged frame position of clip, with println
-		 *  But the bug gone! I didn't check for implementation of Clip class, 
-		 *  so I'm not sure what happened, but I think start() clip just after set position,
-		 *  sometimes start() starts faster than rewinding done. (because clip uses thread)
-		 *  So maybe calling getFramePosition() method synchronizes clip, result in wait for
-		 *  rewind is done.
+
+		/*
+		 * Before playing clip, it must be rewound. But call clip.stop() and
+		 * clip.flush() sometimes fails to rewind,
+		 * 
+		 * I didn't check for implementation of Clip class, so I'm not sure what
+		 * happened, but I think start() clip just after set position, sometimes
+		 * start() starts faster than rewinding done. (because Clip class uses
+		 * thread innerly)
+		 * 
+		 * So busy wait for rewinding is done, but I'm not sure bug is totally gone
 		 */
 		Clip clip = clipMap.get(fileName);
-		//clip.stop();
-		//clip.flush();
+		clip.stop();
+		clip.flush();
 		clip.setFramePosition(0);
-		System.out.println(clip.getFramePosition());
+		while (clip.getFramePosition() != 0) {
+			System.out.println(code + " is waiting");
+		}
+		System.out.println("Start " + code);
 		clip.start();
 	}
 }

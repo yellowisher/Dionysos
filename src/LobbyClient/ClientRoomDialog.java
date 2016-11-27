@@ -94,6 +94,7 @@ public class ClientRoomDialog extends JDialog {
 		}
 	}
 
+	// Refresh room list panel by re-get room list from lobby server
 	@SuppressWarnings("unchecked")
 	public boolean refresh() {
 		listModel.clear();
@@ -141,6 +142,7 @@ public class ClientRoomDialog extends JDialog {
 		}
 	}
 
+	// Refresh room list panel by re-get room list from broadcast
 	public boolean lanRefresh() {
 		listModel.clear();
 		RoomInfo roomInfo = null;

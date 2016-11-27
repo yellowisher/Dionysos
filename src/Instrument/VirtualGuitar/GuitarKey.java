@@ -1,6 +1,5 @@
 package Instrument.VirtualGuitar;
 
-import java.awt.Image;
 import javax.swing.ImageIcon;
 import Instrument.Key;
 

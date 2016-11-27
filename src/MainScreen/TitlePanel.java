@@ -108,11 +108,9 @@ public class TitlePanel extends JPanel {
 
 			if (type.equals("Join Room")) {
 				new ClientRoomDialog(frame, lanCheckBox.isSelected());
-				// TODO : Try connect here
 			}
 			else if (type.equals("Create Room")) {
 				new HostRoomDialog(frame);
-				// TODO : Create room here
 			}
 		}
 	}

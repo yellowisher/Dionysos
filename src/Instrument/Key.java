@@ -1,6 +1,5 @@
 package Instrument;
 
-import javax.sound.sampled.Clip;
 import javax.swing.JLabel;
 
 public abstract class Key extends JLabel {

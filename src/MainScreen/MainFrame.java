@@ -29,6 +29,8 @@ public class MainFrame extends JFrame {
 		setIconImage(image);
 
 		// Setting for CardLayout
+		// By using CardLayout, we can change panel in frame without
+		// deleting and creating new one
 		getContentPane().setLayout(panelHolder);
 		getContentPane().add("Title", new TitlePanel(WIDTH, HEIGHT, this));
 		getContentPane().add("Room", roomPanel);
