@@ -111,7 +111,7 @@ public class ClientRoomDialog extends JDialog {
 			socket = new DatagramSocket();
 			DatagramPacket request = new DatagramPacket(send, send.length, LobbyServerInfo.IPAddress, LobbyServerInfo.clientPort);
 			DatagramPacket receivePacket = new DatagramPacket(data, data.length);
-			socket.setSoTimeout(1500);
+			socket.setSoTimeout(3000);
 			socket.send(request);
 
 			while (true) {

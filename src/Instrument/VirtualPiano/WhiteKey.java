@@ -15,7 +15,13 @@ class WhiteKey extends Key {
 	public WhiteKey() {
 		super();
 		if (keyUpImage == null) resizeImage();
+
 		this.setIcon(keyUpImage);
+
+//		this.setFont(new Font("Arial", Font.PLAIN, 22));
+//		this.setText("F");
+//		this.setHorizontalTextPosition(JLabel.CENTER);
+//		this.setVerticalTextPosition(JLabel.BOTTOM);
 	}
 
 	@Override

@@ -16,19 +16,19 @@ public class VirtualPiano extends JPanel implements KeyListener {
 	static final int NUM_BLACK_KEY = 15;
 	static final int NUM_WHITE_KEY = 22;
 	Client client;
-	
+
 	BlackKey[] blackKeys = new BlackKey[NUM_BLACK_KEY];
 	WhiteKey[] whiteKeys = new WhiteKey[NUM_WHITE_KEY];
 	HashMap<Integer, Key> keyMap = new HashMap<Integer, Key>();
 
 	public VirtualPiano(Client client) {
 		this.client = client;
-		
-		setBackground(new Color(247, 145, 0));
+
+		setBackground(new Color(149, 89, 117));
 		setPreferredSize(new Dimension(920, 350));
 		setSize(new Dimension(920, 350));
 		setLayout(null);
-		
+
 		int keyWidth = BlackKey.WIDTH;
 		int keyHeight = BlackKey.HEIGHT;
 

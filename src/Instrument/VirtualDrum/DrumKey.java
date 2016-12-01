@@ -50,6 +50,7 @@ public class DrumKey extends Key {
 
 	@Override
 	public void keyUp() {
+		if (!isPressed) return;
 		isPressed = false;
 		setLocation((int) (getLocation().getX() + xDelta), (int) (getLocation().getY()));
 		setIcon(keyUpImage);

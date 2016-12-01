@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Caret;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.StyledDocument;
 
@@ -42,11 +43,11 @@ import javax.swing.text.StyleContext;
 public class RoomPanel extends JPanel {
 
 	//private javax.swing.JTextArea msgArea;
-	private JTextPane msgArea;
+	public JTextPane msgArea;
 
 	public CardLayout instHolder;
 	private JPanel focusDest;
-	private StyledDocument document;
+	public StyledDocument document;
 	
 	public Client client;
 	public Server server;
@@ -183,6 +184,7 @@ public class RoomPanel extends JPanel {
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 		jScrollPane2.setViewportView(msgArea);
+		((DefaultCaret)msgArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 		sendBtn.setText("Send");
 		jScrollPane1.setViewportView(userList);
@@ -332,8 +334,8 @@ public class RoomPanel extends JPanel {
 	public javax.swing.JButton exitBtn;
 	private javax.swing.JPanel jPanel2;
 	private javax.swing.JPanel jPanel4;
-	private javax.swing.JScrollPane jScrollPane1;
-	private javax.swing.JScrollPane jScrollPane2;
+	public javax.swing.JScrollPane jScrollPane1;
+	public javax.swing.JScrollPane jScrollPane2;
 
 	private javax.swing.JPanel jpChoice;
 	private javax.swing.JPanel jpInstru;
@@ -343,6 +345,6 @@ public class RoomPanel extends JPanel {
 	public javax.swing.JButton recordBtn;
 	private javax.swing.JButton sendBtn;
 	private javax.swing.JLabel time;
-	private javax.swing.JTextField txtField;
-	private javax.swing.JList<String> userList;
+	public javax.swing.JTextField txtField;
+	public javax.swing.JList<String> userList;
 }

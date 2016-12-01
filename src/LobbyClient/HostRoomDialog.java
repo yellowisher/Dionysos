@@ -102,7 +102,8 @@ public class HostRoomDialog extends JDialog {
 				/*
 				 * If user created LAN room; start UDP listening server that
 				 * listen for local user request. In online mode, lobby server
-				 * do this, but in LAN mode, there is no lobby server so host have to listen
+				 * do this, but in LAN mode, there is no lobby server so host
+				 * have to listen
 				 */
 				if (isLocal) {
 					roomInfo.IPAdress = InetAddress.getLocalHost().getHostAddress();
@@ -142,11 +143,15 @@ public class HostRoomDialog extends JDialog {
 
 							if (device == null) {
 								System.out.println("Cannot find gateway router!");
+								MainFrame.instance.setTitle("Dionysos [UPNP FAILED]");
 							}
 							else if (!device.addPortMapping(port, port, device.getLocalAddress().getHostAddress(), "TCP", "Dionysos!")) {
 								System.out.println("Mapping failed!");
 								listener.close();
 								return;
+							}
+							else {
+								System.out.println("Mapping " + port);
 							}
 						}
 					}

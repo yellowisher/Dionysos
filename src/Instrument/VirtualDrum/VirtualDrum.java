@@ -21,8 +21,8 @@ public class VirtualDrum extends JPanel implements KeyListener {
 
 	public VirtualDrum(Client client) {
 		this.client = client;
-		
-		setBackground(new Color(125, 187, 23));
+
+		setBackground(new Color(213, 54, 48));
 		setSize(new Dimension(920, 350));
 		setLayout(null);
 

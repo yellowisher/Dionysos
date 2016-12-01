@@ -31,7 +31,7 @@ public class VirtualGuitar extends JPanel implements KeyListener {
 	public VirtualGuitar(Client client) {
 		this.client = client;
 
-		setBackground(new Color(13, 100, 222));
+		setBackground(new Color(243, 176, 33));
 		setPreferredSize(new Dimension(920, 350));
 		setSize(new Dimension(920, 350));
 		setLayout(null);
@@ -123,7 +123,7 @@ public class VirtualGuitar extends JPanel implements KeyListener {
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {		
+	public void keyPressed(KeyEvent e) {
 		Key key = keyMap.get(e.getKeyCode());
 		if (key == null) return;
 

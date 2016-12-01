@@ -16,7 +16,7 @@ import RoomInfo.RoomInfo;
 public class ClientRoomRenderer extends JPanel implements ListCellRenderer<RoomInfo> {
 	static ImageIcon lockIcon = new ImageIcon("Resource/Image/Icon_Lock.png");
 	static ImageIcon emptyIcon = new ImageIcon("Resource/Image/Icon_Empty.png");
-	static Font font = new Font("Arial", Font.BOLD, 22);
+	static Font font = new Font("Arial Unicode MS", Font.BOLD, 22);
 
 	JLabel roomName = new JLabel();
 	JLabel numUser = new JLabel();
