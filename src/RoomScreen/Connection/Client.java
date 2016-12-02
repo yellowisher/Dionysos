@@ -4,7 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import javax.swing.BorderFactory;
@@ -21,10 +23,12 @@ import javax.swing.border.LineBorder;
 import Instrument.VirtualDrum.VirtualDrum;
 import Instrument.VirtualGuitar.VirtualGuitar;
 import Instrument.VirtualPiano.VirtualPiano;
+import LobbyClient.LobbyServerInfo;
 import MainScreen.MainFrame;
 import RoomInfo.RoomInfo;
-import RoomScreen.Layout.*;
-import RoomScreen.Manager.*;
+import RoomScreen.Layout.Choice;
+import RoomScreen.Layout.RoomPanel;
+import RoomScreen.Manager.PlayManager;
 
 public class Client extends Thread {
 	private static final int STATE_NOTHING = 0;
@@ -180,15 +184,22 @@ public class Client extends Thread {
 			System.out.println("Client : Client try to connect to " + info.IPAdress + ":" + info.port);
 
 			dialog = new ConnDialog(MainFrame.instance);
-			Socket socket = new Socket(info.IPAdress, info.port);
+			Socket socket = null;
+			if (info.holePunch) {
+				TCPHolePuncher puncher = new TCPHolePuncher(TCPHolePuncher.TYPE_CLIENT, info.roomName);
+				// Wait for TCPHolePuncher finish connect
+				puncher.start();
+				puncher.join();
+
+				socket = puncher.connectedSocket;
+			}
+			if (socket == null || !info.holePunch) socket = new Socket(info.IPAdress, info.port);
 			dialog.dispose();
-			//Socket socket = new Socket(info.getIp(), info.getPort());
 
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
 
 			// Process all messages from server, according to the protocol.
-
 			while (true) {
 				String line = in.readLine();
 
@@ -203,23 +214,23 @@ public class Client extends Thread {
 					break;
 				}
 			}
-			
+
 			while (true) {
 				String line = in.readLine();
-				
+
 				if (line.startsWith("SUBMITNAME")) {
-					
+
 					while (true) {
 						name = getNick(); // id input msg.
 						if (name == null || name.equals("")) continue;
 						break;
 					}
 					out.println(name);
-					
+
 				}
 				else if (line.startsWith("NAMEACCEPTED")) {
 					textField.setEditable(true);
-					
+
 				}
 				else if (line.startsWith("BROADCAST")) {
 					//server broadcasts room information.

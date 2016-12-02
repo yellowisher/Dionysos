@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.Buffer;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,50 +24,89 @@ public class Server extends Thread {
 
 	private static Hashtable<String, PrintWriter> writers = new Hashtable<String, PrintWriter>();
 	private ServerSocket listener;
+	private Timer surviveReporter;
 
 	// If there is no reference to socket, GC gonna free it!
 	@SuppressWarnings("unused")
 	private Socket lobbySocket;
 	private static ObjectOutputStream lobbyWriter;
+	private static BufferedReader lobbyReader;
 
 	private GatewayDevice device;
 	private LANListener lanListener;
 	private int port;
+	private String roomName;
 
-	public Server(GatewayDevice device, ServerSocket listener, Socket socket, LANListener lanListener) throws Exception {
+	public Server(GatewayDevice device, ServerSocket listener, Socket socket, LANListener lanListener, String roomName) throws Exception {
 		this.device = device;
 		this.listener = listener;
 		this.lanListener = lanListener;
+		this.roomName = roomName;
 		RoomPanel.instance.server = this;
 
+		// lanListener is null; When is not LAN mode, start reporting(pint) to lobby server
+		// if it fails 4 times, lobby server remove it from room list
 		if (lanListener == null) {
 			lobbySocket = socket;
 			lobbyWriter = new ObjectOutputStream(socket.getOutputStream());
+			lobbyReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			port = socket.getLocalPort();
+
+			surviveReporter = new Timer();
+			surviveReporter.schedule(new Reporter(), RoomInfo.PING_DELAY, RoomInfo.PING_DELAY);
 		}
 		numUser = 0;
 	}
-	
+
 	public void closeServer() {
-		
 	}
 
+	// Listener for accept client join
 	@Override
 	public void run() {
-		System.out.println("Room server start running : " + listener.getLocalPort());
+		System.out.println("Room server start running");
+
 		try {
 			while (true) {
-				new Handler(listener.accept(), lanListener).start();
+				// Client listener is null; when using TCP hole punching
+				// Start listening to lobby server, hole punching request
+				if (listener == null) {
+					String line = lobbyReader.readLine();
+					if (line != null && line.startsWith("CONN")) {
+						TCPHolePuncher puncher = new TCPHolePuncher(TCPHolePuncher.TYPE_HOST, roomName);
+						// Wait for TCPHolePuncher finish connect
+						puncher.start();
+						puncher.join();
+
+						Socket socket = puncher.connectedSocket;
+						if (socket != null) {
+							// Connection done by TCP hole punching;
+							new Handler(socket, lanListener).start();
+						}
+					}
+				}
+				// Client listener is not null; listen for client connections
+				else {
+					new Handler(listener.accept(), lanListener).start();
+				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
 			try {
 				if (device != null) device.deletePortMapping(port, "TCP");
-
 				if (lanListener != null) listener.close();
 				else lanListener.endListen();
-			} catch (IOException | SAXException e) {
+			} catch (IOException | SAXException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+
+	class Reporter extends TimerTask {
+		@Override
+		public void run() {
+			try {
+				lobbyWriter.writeObject("Ping");
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -77,20 +117,12 @@ public class Server extends Thread {
 		private Socket socket;
 		private BufferedReader in;
 		private PrintWriter out;
-		private Timer surviveReporter;
 		private LANListener lanListener;
 
 		public Handler(Socket socket, LANListener lanListener) {
 			System.out.println("Server : Client with port " + socket.getPort() + " try to connect...");
 			this.socket = socket;
 			this.lanListener = lanListener;
-
-			// Start reporting; if it fails 4 times, lobby server remove its information
-			// from its list.
-			if (lanListener == null) {
-				surviveReporter = new Timer();
-				surviveReporter.schedule(new Reporter(), RoomInfo.PING_DELAY, RoomInfo.PING_DELAY);
-			}
 		}
 
 		public void run() {
@@ -191,17 +223,6 @@ public class Server extends Thread {
 			} finally {
 				try {
 					socket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		class Reporter extends TimerTask {
-			@Override
-			public void run() {
-				try {
-					lobbyWriter.writeObject("Ping");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

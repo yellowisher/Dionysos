@@ -1,5 +1,6 @@
 package MainScreen;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -22,7 +23,7 @@ import LobbyClient.HostRoomDialog;
 public class TitlePanel extends JPanel {
 
 	MainFrame frame;
-	JCheckBox lanCheckBox = new JCheckBox("LAN");
+	JCheckBox lanCheckBox;
 
 	TitlePanel(int frameWidth, int frameHeight, MainFrame frame) {
 		this.setLayout(null);
@@ -36,6 +37,17 @@ public class TitlePanel extends JPanel {
 		titleImage.setBounds((frameWidth - imageWidth) / 2, 10, imageWidth, imageHeight);
 		add(titleImage);
 		setBackground(new Color(255, 200, 200));
+
+		JPanel checkBoxPanel = new JPanel();
+		checkBoxPanel.setBounds((frameWidth - 207) / 2, 410, 211, 80);
+		checkBoxPanel.setBorder(new LineBorder(new Color(247, 145, 0), 4));
+		checkBoxPanel.setLayout(new GridBagLayout());
+
+		lanCheckBox = new JCheckBox("LAN only");
+		lanCheckBox.setFont(new Font("Arial", Font.PLAIN, 30));
+
+		checkBoxPanel.add(lanCheckBox);
+		add(checkBoxPanel);
 
 		// Panel for join room
 		JPanel joinRoom = new JPanel();
@@ -58,19 +70,13 @@ public class TitlePanel extends JPanel {
 		gc.gridy = 1;
 		joinRoom.add(joinRoomBtn, gc);
 
-		JPanel textPanel = new JPanel();
-		gc.gridx = 1;
-		gc.gridy = 2;
-		joinRoom.add(textPanel, gc);
-
 		// Join room text
 		JLabel joinRoomText = new JLabel("Jump into friend's room!");
 		joinRoomText.setFont(joinRoomText.getFont().deriveFont(16f));
 		joinRoomText.setHorizontalAlignment(SwingConstants.CENTER);
-
-		textPanel.setBackground(new Color(255, 200, 200));
-		textPanel.add(joinRoomText);
-		textPanel.add(lanCheckBox);
+		gc.gridx = 1;
+		gc.gridy = 2;
+		joinRoom.add(joinRoomText, gc);
 
 		// Panel for create room
 		JPanel createRoom = new JPanel();
@@ -110,7 +116,7 @@ public class TitlePanel extends JPanel {
 				new ClientRoomDialog(frame, lanCheckBox.isSelected());
 			}
 			else if (type.equals("Create Room")) {
-				new HostRoomDialog(frame);
+				new HostRoomDialog(frame, lanCheckBox.isSelected());
 			}
 		}
 	}

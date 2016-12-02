@@ -15,6 +15,7 @@ public class LobbyServerInfo {
 	public static InetAddress IPAddress;
 	public static final int hostPort = 9392;
 	public static final int clientPort = 9322;
+	public static final int punchPort = 9999;
 
 	private static boolean inited = false;
 
