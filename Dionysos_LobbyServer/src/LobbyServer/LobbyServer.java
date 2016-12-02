@@ -17,6 +17,7 @@ public class LobbyServer {
 	private static final int PORT = 9392;
 
 	private static HashMap<String, RoomInfo> roomMap = new HashMap<String, RoomInfo>();
+	private static HashMap<String, PrintWriter> writerMap = new HashMap<String, PrintWriter>();
 
 	public static void main(String[] args) throws Exception {
 
@@ -26,6 +27,7 @@ public class LobbyServer {
 		try {
 			// Start request listening thread
 			new RequestListener(roomMap).start();
+			new STTNServer(roomMap, writerMap).start();
 
 			while (true) {
 				// Start host listening thread
@@ -64,6 +66,7 @@ public class LobbyServer {
 					room.IPAdress = socket.getInetAddress().getHostAddress();
 					writer.println(room.IPAdress + "/" + socket.getPort());
 					roomMap.put(room.roomName, room);
+					writerMap.put(room.roomName, writer);
 				}
 
 				String msg;
@@ -90,6 +93,7 @@ public class LobbyServer {
 				try {
 					System.out.println("A room is closed");
 					roomMap.remove(room.roomName);
+					writerMap.remove(room.roomName);
 					socket.close();
 				} catch (IOException e1) {
 
