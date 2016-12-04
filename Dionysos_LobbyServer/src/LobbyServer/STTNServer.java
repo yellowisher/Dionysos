@@ -113,6 +113,7 @@ public class STTNServer extends Thread {
 
 					if (sendStr == null) {
 						System.out.println("Host didn't response to request!");
+						waitingList.remove(this);
 					}
 					else {
 						writer.println(sendStr);
