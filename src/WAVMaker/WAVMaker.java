@@ -22,6 +22,7 @@ public class WAVMaker {
 
 	FileInputStream history;
 
+	// Read recored time from history text file
 	private int readTime() throws IOException {
 		byte[] time = new byte[9];
 		history.read(time, 0, 9);
@@ -34,6 +35,7 @@ public class WAVMaker {
 		return milliseconds;
 	}
 
+	// Read protocol from history text file
 	String readMsg() throws IOException {
 		byte[] msg = new byte[6];
 		history.read(msg, 0, 6);
@@ -41,6 +43,7 @@ public class WAVMaker {
 		return new String(msg);
 	}
 
+	// Convert time to index
 	int toIndex(int time) {
 		int index = (int) Math.ceil(time * 0.001 * sampleRate * (bitPerSample / 8) * numChannel);
 		if (index % 2 == 1) index++;

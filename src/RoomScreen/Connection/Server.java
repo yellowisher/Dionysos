@@ -45,7 +45,7 @@ public class Server extends Thread {
 		RoomPanel.instance.server = this;
 
 		// lanListener is null; When is not LAN mode, start reporting(pint) to lobby server
-		// if it fails 4 times, lobby server remove it from room list
+		// if it fails 4 times in a row, lobby server remove it from room list
 		if (lanListener == null) {
 			lobbySocket = socket;
 			lobbyWriter = new ObjectOutputStream(socket.getOutputStream());
@@ -68,12 +68,14 @@ public class Server extends Thread {
 
 		try {
 			while (true) {
+				
 				// Client listener is null; when using TCP hole punching
 				// Start listening to lobby server, hole punching request
 				if (listener == null) {
 					String line = lobbyReader.readLine();
 					if (line != null && line.startsWith("CONN")) {
 						TCPHolePuncher puncher = new TCPHolePuncher(TCPHolePuncher.TYPE_HOST, roomName);
+					
 						// Wait for TCPHolePuncher finish connect
 						puncher.start();
 						puncher.join();

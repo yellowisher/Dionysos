@@ -77,9 +77,9 @@ public class HostRoomDialog extends JDialog {
 			UPnP = new JRadioButton("UPnP");
 			punch = new JRadioButton("Hole Punch");
 
-			none.setToolTipText("No option: If you are using NAT, client might not join the room");
+			none.setToolTipText("No option: If you are using NAT, client might not be able to join your room");
 			UPnP.setToolTipText("Try UPnP: Try to port mapping by UPnP");
-			punch.setToolTipText("TCP hole punching: nTry to hole punching");
+			punch.setToolTipText("TCP hole punching: Try to hole punching");
 
 			none.setSelected(true);
 
@@ -134,8 +134,8 @@ public class HostRoomDialog extends JDialog {
 
 				/*
 				 * If user created LAN room; start UDP listening server that
-				 * listen for local user request. In online mode, lobby server
-				 * do this, but in LAN mode, there is no lobby server so host
+				 * listen for local client request. In online mode, lobby server
+				 * do this, but in LAN mode, there is no lobby server, so host
 				 * have to listen itself
 				 */
 				if (isLocal) {
@@ -144,12 +144,10 @@ public class HostRoomDialog extends JDialog {
 					lanListener.start();
 				}
 				else {
-					// If user created online room; try to UPnP and/or hole punching
+					// If user created online room; try to UPnP or hole punching
 					boolean doUPnP = false, doPunch = false;
 					if (UPnP.isSelected()) doUPnP = true;
 					else if (punch.isSelected()) doPunch = true;
-
-					System.out.println("UPNP: " + UPnP + " Punch " + punch);
 
 					LobbyServerInfo.init();
 					socket = new Socket();
@@ -157,6 +155,8 @@ public class HostRoomDialog extends JDialog {
 					BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
+					// If doing hole punching, host don't have to listen for client's join request
+					// Client join room indirectly, request hole punching server first
 					if (doPunch) {
 						roomInfo.holePunch = true;
 						listener.close();
@@ -183,7 +183,7 @@ public class HostRoomDialog extends JDialog {
 								discover.discover();
 								device = discover.getValidGateway();
 
-								// We have to check for already mapped?
+								// We have to check for already mapped entry?
 								//PortMappingEntry portMapping = new PortMappingEntry();
 
 								if (device == null) {
@@ -207,9 +207,10 @@ public class HostRoomDialog extends JDialog {
 				parent.changePanel("Room");
 				dispose();
 
-				Thread.sleep(1000);
+				// Little delay for server open
+				Thread.sleep(100);
 				
-				// Host connect to its room via local address (faster)
+				// Host join its room via local address (much faster)
 				roomInfo.IPAdress = InetAddress.getLocalHost().getHostAddress();
 				new Client(roomInfo).start();
 

@@ -39,6 +39,11 @@ public class DrumKey extends Key {
 		setIcon(keyUpImage);
 	}
 
+	/*
+	 * Visual effect when hit drum
+	 * set size * 1.1 and change its position little bit
+	 * to make it looks like its scaling position is center
+	 */
 	@Override
 	public boolean keyDown() {
 		if (isPressed) return false;

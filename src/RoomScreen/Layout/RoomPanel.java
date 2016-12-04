@@ -189,7 +189,7 @@ public class RoomPanel extends JPanel {
 		sendBtn.setText("Send");
 		jScrollPane1.setViewportView(userList);
 
-		//TODO: BUG FIX
+		//TODO: UI BUG FIX
 		javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
 		jPanel4.setLayout(jPanel4Layout);
 

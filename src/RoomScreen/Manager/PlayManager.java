@@ -12,7 +12,14 @@ public class PlayManager {
 	public PlayManager() {
 
 	}
+	
+	/*
+	 * Clip get by AudioSystem is OS resource, DO NOT store it to map,
+	 * have to return it to OS after use
+	 * And attach listener to close Clip
+	 */
 	public void play(String instru, String code) throws Exception {
+		System.out.println("Print " + code);
 		Clip clip = AudioSystem.getClip();
 		clip.open(AudioSystem.getAudioInputStream(new File("Resource/Audio/" + instru + "/" + code + ".wav")));
 		clip.start();
@@ -24,18 +31,5 @@ public class PlayManager {
 				}
 			}
 		});
-
-		/*
-		 * Before playing clip, it must be rewound. But call clip.stop() and
-		 * clip.flush() sometimes fails to rewind,
-		 * 
-		 * I didn't check for implementation of Clip class, so I'm not sure what
-		 * happened, but I think start() clip just after set position, sometimes
-		 * start() starts faster than rewinding done. (because Clip class uses
-		 * thread innerly)
-		 * 
-		 * So busy wait for rewinding is done, but I'm not sure bug is totally
-		 * gone
-		 */
 	}
 }

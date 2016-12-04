@@ -1,5 +1,6 @@
 package RoomScreen.Connection;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -31,10 +32,10 @@ import RoomScreen.Layout.RoomPanel;
 import RoomScreen.Manager.PlayManager;
 
 public class Client extends Thread {
-	private static final int STATE_NOTHING = 0;
-	private static final int STATE_PIANO = 1;
-	private static final int STATE_GUITAR = 2;
-	private static final int STATE_DRUM = 3;
+	private static final int STATE_NOTHING = -1;
+	private static final int STATE_PIANO = 0;
+	private static final int STATE_GUITAR = 1;
+	private static final int STATE_DRUM = 2;
 	int currentState;
 
 	RoomInfo info;
@@ -113,65 +114,60 @@ public class Client extends Thread {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (currentState == STATE_PIANO) return;
-				currentState = STATE_PIANO;
-
-				pianoBtn.setBorder(selected);
-				guitarBtn.setBorder(notSelected);
-				drumBtn.setBorder(notSelected);
-				out.println("CHOICE Piano");
-
-				JPanel jp = (JPanel) frame.getJpInstru();
-				jp.removeAll();
-				VirtualPiano vpPanel = new VirtualPiano(instance);
-				jp.add(vpPanel);
-				vpPanel.requestFocus();
-				frame.setFocusDest(vpPanel);
-				frame.repaint();
+				changeInst(STATE_PIANO);
 			}
 		});
 		guitarBtn.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (currentState == STATE_GUITAR) return;
-				currentState = STATE_GUITAR;
-
-				guitarBtn.setBorder(selected);
-				pianoBtn.setBorder(notSelected);
-				drumBtn.setBorder(notSelected);
-				out.println("CHOICE Guitar");
-
-				JPanel jp = (JPanel) frame.getJpInstru();
-				jp.removeAll();
-				VirtualGuitar vpPanel = new VirtualGuitar(instance);
-				jp.add(vpPanel);
-				vpPanel.requestFocus();
-				frame.setFocusDest(vpPanel);
-				frame.repaint();
+				changeInst(STATE_GUITAR);
 			}
 		});
 		drumBtn.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (currentState == STATE_DRUM) return;
-				currentState = STATE_DRUM;
-
-				drumBtn.setBorder(selected);
-				pianoBtn.setBorder(notSelected);
-				guitarBtn.setBorder(notSelected);
-				out.println("CHOICE Drum");
-
-				JPanel jp = (JPanel) frame.getJpInstru();
-				jp.removeAll();
-				VirtualDrum vdPanel = new VirtualDrum(instance);
-				jp.add(vdPanel);
-				vdPanel.requestFocus();
-				frame.setFocusDest(vdPanel);
-				frame.repaint();
+				changeInst(STATE_DRUM);
 			}
 		});
+	}
+
+	private void changeInst(int newState) {
+		if (currentState == newState) return;
+		currentState = newState;
+
+		guitarBtn.setBorder(notSelected);
+		pianoBtn.setBorder(notSelected);
+		drumBtn.setBorder(notSelected);
+		JPanel inst = null;
+
+		switch (currentState) {
+			case STATE_PIANO :
+				pianoBtn.setBorder(selected);
+				out.println("CHOICE Piano");
+				inst = new VirtualPiano(instance);
+				break;
+
+			case STATE_GUITAR :
+				guitarBtn.setBorder(selected);
+				out.println("CHOICE Guitar");
+				inst = new VirtualGuitar(instance);
+				break;
+
+			case STATE_DRUM :
+				drumBtn.setBorder(selected);
+				out.println("CHOICE Drum");
+				inst = new VirtualDrum(instance);
+				break;
+		}
+
+		JPanel jp = (JPanel) frame.getJpInstru();
+		jp.removeAll();
+		jp.add(inst);
+		inst.requestFocus();
+		frame.setFocusDest(inst);
+		frame.repaint();
 	}
 
 	private String getNick() {
@@ -187,7 +183,7 @@ public class Client extends Thread {
 			Socket socket = null;
 			if (info.holePunch) {
 				TCPHolePuncher puncher = new TCPHolePuncher(TCPHolePuncher.TYPE_CLIENT, info.roomName);
-				// Wait for TCPHolePuncher finish connect
+				// Wait for TCPHolePuncher finishes connect
 				puncher.start();
 				puncher.join();
 
@@ -217,6 +213,7 @@ public class Client extends Thread {
 
 			while (true) {
 				String line = in.readLine();
+				System.out.println(line);
 
 				if (line.startsWith("SUBMITNAME")) {
 
@@ -249,21 +246,23 @@ public class Client extends Thread {
 					userList.setModel(listModel);
 				}
 				else {
-					if (frame.isRecording) {
-						frame.recorder.record(line);
-					}
-					String note = line.substring(3, 6);
 
-					switch (line.charAt(0)) {
-						case 'P' :
-							if (line.charAt(1) == 'D') pm.play("Piano", note);
-							break;
-						case 'G' :
-							if (line.charAt(1) == 'H') pm.play("Guitar", note);
-							break;
-						case 'D' :
-							if (line.charAt(1) == 'H') pm.play("Drum", note);
-							break;
+					String[] inputs = line.split("/");
+					for (String input : inputs) {
+						if (frame.isRecording) frame.recorder.record(input);
+						String note = input.substring(3, 6);
+
+						switch (line.charAt(0)) {
+							case 'P' :
+								if (line.charAt(1) == 'D') pm.play("Piano", note);
+								break;
+							case 'G' :
+								if (line.charAt(1) == 'H') pm.play("Guitar", note);
+								break;
+							case 'D' :
+								if (line.charAt(1) == 'H') pm.play("Drum", note);
+								break;
+						}
 					}
 				}
 			}

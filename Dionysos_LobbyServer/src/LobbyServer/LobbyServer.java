@@ -25,7 +25,7 @@ public class LobbyServer {
 		ServerSocket hostListener = new ServerSocket(PORT);
 
 		try {
-			// Start request listening thread
+			// Start request listening/STTN server thread
 			new RequestListener(roomMap).start();
 			new STTNServer(roomMap, writerMap).start();
 
@@ -46,6 +46,15 @@ public class LobbyServer {
 
 		HostHandler(Socket socket) throws SocketException {
 			this.socket = socket;
+			
+			/*
+			 * Unpredicted host disconnection might result keeps that room info
+			 * even though actually that room is closed (we called it zombie room)
+			 * To prevent this, set so timeout of socket as PING_DELAY * 4
+			 * Host send ping message in every PING_DELAY, so if host
+			 * didn't send or failed to send 4 times in a row (which is almost impossible), 
+			 * close connection
+			 */
 			socket.setSoTimeout(RoomInfo.PING_DELAY * 4);
 		}
 
@@ -56,6 +65,7 @@ public class LobbyServer {
 
 				room = (RoomInfo) reader.readObject();
 
+				// Check for room name duplication
 				synchronized (roomMap) {
 					if (roomMap.containsKey(room.roomName)) {
 						writer.println("EXIST");
@@ -63,6 +73,7 @@ public class LobbyServer {
 						return;
 					}
 
+					// Send external end point of room; for debug
 					room.IPAdress = socket.getInetAddress().getHostAddress();
 					writer.println(room.IPAdress + "/" + socket.getPort());
 					roomMap.put(room.roomName, room);

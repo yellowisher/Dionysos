@@ -8,6 +8,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeoutException;
 
 import LobbyClient.LobbyServerInfo;
 
@@ -33,16 +35,17 @@ public class TCPHolePuncher extends Thread {
 		InetSocketAddress oppPrivatePoint, oppPublicPoint;
 
 		// TCP hole punching Step #1
-		// Connect to TCP hole punching helper server
+		// Connect to TCP hole punching helper(STTN) server
 		// Send IP address, port number of this host to server,
 		// read oppenent's private/public IP and port from server.
 		try {
 			Socket punchSocket = new Socket();
 
-			// We have to use same port number furthermore; set reuse address
+			// We have to use same port number furthermore; set reuse address option true
 			punchSocket.setReuseAddress(true);
 
 			punchSocket.bind(new InetSocketAddress(0));
+			punchSocket.setSoTimeout(5000);
 			port = punchSocket.getLocalPort();
 			punchSocket.connect(new InetSocketAddress(LobbyServerInfo.IPAddress, LobbyServerInfo.punchPort));
 			System.out.println("Connected to punch server!");
@@ -54,7 +57,6 @@ public class TCPHolePuncher extends Thread {
 			str += InetAddress.getLocalHost().getHostAddress() + "/" + port;
 			writer.println(str);
 			String[] info = reader.readLine().split("/");
-
 			
 			oppPrivatePoint = new InetSocketAddress(info[0], Integer.parseInt(info[1]));
 			oppPublicPoint = new InetSocketAddress(info[2], Integer.parseInt(info[3]));
@@ -64,7 +66,7 @@ public class TCPHolePuncher extends Thread {
 			System.out.println("public "+info[2]+":"+info[3]);
 			
 			punchSocket.close();
-		} catch (IOException e) {
+		} catch (IOException e ) {
 			System.out.println("Failed to connect lobby server");
 			e.printStackTrace();
 			return;
@@ -100,7 +102,9 @@ public class TCPHolePuncher extends Thread {
 					e1.printStackTrace();
 				}
 
-				// Connect to "real" ServerSocket that might be punched 
+				// TCP hole punching Step #3
+				// Connect to host's public end point, which might be
+				// punched for realSocket
 				try {
 					realSocket = new Socket();
 					realSocket.setReuseAddress(true);
@@ -145,7 +149,7 @@ public class TCPHolePuncher extends Thread {
 						ioe.printStackTrace();
 					}
 
-					// Client failed connection to private end point
+					// Client failed to connect to private end point
 					// Send dummy packet (which would not reach to client) for
 					// punch a hole on NAT
 					dummySocket = new Socket();
@@ -170,6 +174,7 @@ public class TCPHolePuncher extends Thread {
 						publicSocket.bind(new InetSocketAddress(port));
 						connectedSocket = publicSocket.accept();
 						System.out.println("TCP hole punching succeed");
+						
 					} catch (Exception e2) {
 						// Failed to hole punching
 						System.out.println("TCP hole punching failed");

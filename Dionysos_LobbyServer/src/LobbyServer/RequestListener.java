@@ -40,7 +40,7 @@ public class RequestListener extends Thread {
 
 			} catch (IOException e) {
 				listenSocket.close();
-				System.out.println("Request listener closing");
+				System.out.println("Request listener is closing");
 			}
 		}
 	}

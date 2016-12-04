@@ -69,6 +69,7 @@ public class ClientRoomDialog extends JDialog {
 					e.consume();
 					RoomInfo roomInfo = (RoomInfo) roomList.getSelectedValue();
 
+					// Checking password in client maybe dangerous?
 					if (roomInfo != null) {
 						if (!roomInfo.password.equals("")) {
 							String input = JOptionPane.showInputDialog(frame, "Input password :", "Password required", JOptionPane.PLAIN_MESSAGE);
@@ -85,6 +86,7 @@ public class ClientRoomDialog extends JDialog {
 				}
 			}
 		});
+		// Refreshing, requesting room list is depends on LAN or online
 		if (lanOnly ? lanRefresh() : refresh()) setVisible(true);
 	}
 
@@ -94,7 +96,7 @@ public class ClientRoomDialog extends JDialog {
 		}
 	}
 
-	// Refresh room list panel by re-get room list from lobby server
+	// Refresh room list panel by requesting room list from lobby server
 	@SuppressWarnings("unchecked")
 	public boolean refresh() {
 		listModel.clear();
@@ -142,7 +144,7 @@ public class ClientRoomDialog extends JDialog {
 		}
 	}
 
-	// Refresh room list panel by re-get room list from broadcast
+	// Refresh room list panel by request room list from broadcast
 	public boolean lanRefresh() {
 		listModel.clear();
 		RoomInfo roomInfo = null;
@@ -159,6 +161,7 @@ public class ClientRoomDialog extends JDialog {
 			socket.setBroadcast(true);
 			socket.bind(null);
 
+			// Maybe change to local broadcast address something like 192.168.0.255?
 			DatagramPacket request = new DatagramPacket(send, send.length, InetAddress.getByName("255.255.255.255"), 7712);
 			socket.send(request);
 			socket.setSoTimeout(500);

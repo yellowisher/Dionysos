@@ -4,6 +4,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
+/*
+ * Recorder, actually it records protocols, not the sound
+ * save it as .txt file and WAVMaker creates a .wav file
+ */
 public class Recorder {
 
 	String buffer;

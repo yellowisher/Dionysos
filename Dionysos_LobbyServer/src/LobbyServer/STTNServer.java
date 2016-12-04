@@ -11,8 +11,14 @@ import java.util.HashMap;
 
 import RoomInfo.RoomInfo;
 
-// STTN(Simple Traversal of TCP Through NAT) Server!
-// TCP version of STUN server
+/* 
+ * STTN(Simple Traversal of TCP Through NAT) Server!
+ * TCP version of STUN server
+ * To TCP hole punching, host can client have to know each other's public/private end points
+ * So this server do that role
+ * Referenced document -> http://www.bford.info/pub/net/p2pnat/index.html
+ */
+
 public class STTNServer extends Thread {
 	private static final int PORT = 9999;
 
@@ -35,6 +41,12 @@ public class STTNServer extends Thread {
 				new PunchHandler(punchListener.accept()).start();
 			} catch (IOException e) {
 				e.printStackTrace();
+				try {
+					punchListener.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				System.out.println("Hole punch helper is closing");
 			}
 		}
 	}
@@ -43,7 +55,6 @@ public class STTNServer extends Thread {
 		static final int TYPE_HOST = 0;
 		static final int TYPE_CLIENT = 1;
 		int type;
-		boolean waiting;
 		String myStr, sendStr;
 
 		Socket socket;
@@ -76,23 +87,37 @@ public class STTNServer extends Thread {
 
 				if (targetRoom == null) return;
 
-				// When client send hole punching request message;
-				// Send host to hole punch, wait for host
+				// When client sent hole punching request message;
+				// Tell host to punch a hole, wait for response from host
 				if (type == TYPE_CLIENT) {
+					// When host response arrives, fill this String
+					sendStr = null;
+
+					// Put this class(which is also Thread) waiting list
+					// There could be several join request to same room at the same time,
+					// Handler(this class) must be key in HashMap not room name
 					waitingList.put(this, roomName);
 					roomWriter.println("CONN");
 
-					// Busy wait for host send data
-					// Maybe better idea?
-					System.out.println("Client wait for host : " + roomName);
-					waiting = true;
-					while (waiting) {
-						;
+					// Wait until host response or 3000ms, which considered as
+					// host somehow failed to response (host closed room at perfect timing etc...)
+					System.out.println("Client start waiting for host : " + roomName);
+					synchronized (this) {
+						try {
+							wait(3000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
+					System.out.println("Client finished waiting!");
 
-					System.out.println("Client waiting finished!");
-					writer.println(sendStr);
-					System.out.println("Sent data for punching to client");
+					if (sendStr == null) {
+						System.out.println("Host didn't response to request!");
+					}
+					else {
+						writer.println(sendStr);
+						System.out.println("Sent punching data to client");
+					}
 				}
 				else {
 					// Got message from host;
@@ -100,16 +125,20 @@ public class STTNServer extends Thread {
 					for (PunchHandler handler : waitingList.keySet()) {
 						if (waitingList.get(handler).equals(roomName)) {
 							waitingList.remove(handler);
-							// Send oppenent's end points
+
+							// Send end points of each opponent 
 							handler.sendStr = myStr;
 							sendStr = handler.myStr;
-							handler.waiting = false;
+
+							synchronized (handler) {
+								handler.notify();
+							}
 							break;
 						}
 					}
 
 					writer.println(sendStr);
-					System.out.println("Sent data for punching to host");
+					System.out.println("Sent punching data to host");
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

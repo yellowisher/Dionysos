@@ -28,6 +28,7 @@ public class VirtualGuitar extends JPanel implements KeyListener {
 	ArrayList<GuitarKey> pressedKey;
 	boolean lastWasHit = false;
 
+	// GUI and key binding
 	public VirtualGuitar(Client client) {
 		this.client = client;
 
@@ -130,15 +131,19 @@ public class VirtualGuitar extends JPanel implements KeyListener {
 		if (key.keyDown()) {
 			String keyName = key.getNoteName();
 
-			if (keyName.startsWith("HIT")) {
+			if (keyName.equals("HIT")) {
+				if (storedKey.isEmpty()) return;
+				String message = "";
 				for (Key aKey : storedKey) {
 					aKey.keyDown();
 					pressedKey.add((GuitarKey) aKey);
-					client.sendMessage("GH_" + aKey.getNoteName().substring(0, 3));
-					lastWasHit = true;
+					message += "GH_" + aKey.getNoteName().substring(0, 3) + "/";
 				}
+				client.sendMessage(message);
+				lastWasHit = true;
 			}
-			else if (keyName.startsWith("CANCEL")) {
+
+			else if (keyName.equals("CANCEL")) {
 				storedKey.clear();
 			}
 			else if (keyName.startsWith("c")) {
