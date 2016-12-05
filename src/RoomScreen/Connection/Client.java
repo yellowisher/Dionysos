@@ -94,6 +94,7 @@ public class Client extends Thread {
 	}
 
 	public void sendMessage(String msg) {
+		System.out.println("Send : "+msg);
 		out.println(msg);
 	}
 
@@ -213,8 +214,7 @@ public class Client extends Thread {
 
 			while (true) {
 				String line = in.readLine();
-				System.out.println(line);
-
+				System.out.println("Got : "+line);
 				if (line.startsWith("SUBMITNAME")) {
 
 					while (true) {

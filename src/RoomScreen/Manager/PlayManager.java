@@ -19,7 +19,6 @@ public class PlayManager {
 	 * And attach listener to close Clip
 	 */
 	public void play(String instru, String code) throws Exception {
-		System.out.println("Print " + code);
 		Clip clip = AudioSystem.getClip();
 		clip.open(AudioSystem.getAudioInputStream(new File("Resource/Audio/" + instru + "/" + code + ".wav")));
 		clip.start();

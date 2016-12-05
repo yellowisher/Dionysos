@@ -78,8 +78,8 @@ public class HostRoomDialog extends JDialog {
 			punch = new JRadioButton("Hole Punch");
 
 			none.setToolTipText("No option: If you are using NAT, client might not be able to join your room");
-			UPnP.setToolTipText("Try UPnP: Try to port mapping by UPnP");
-			punch.setToolTipText("TCP hole punching: Try to hole punching");
+			UPnP.setToolTipText("Try UPnP: Try to port mapping by UPnP. Some devices may not support UPnP.");
+			punch.setToolTipText("TCP hole punching: Try to hole punching. You must not use non-korean room name when this is enabled");
 
 			none.setSelected(true);
 
