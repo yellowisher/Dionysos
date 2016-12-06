@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.Buffer;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -16,6 +17,7 @@ import org.bitlet.weupnp.GatewayDevice;
 import org.xml.sax.SAXException;
 
 import LobbyClient.LANListener;
+import MainScreen.MainFrame;
 import RoomInfo.RoomInfo;
 import RoomScreen.Layout.RoomPanel;
 
@@ -23,6 +25,7 @@ public class Server extends Thread {
 	private static int numUser;
 
 	private static Hashtable<String, PrintWriter> writers = new Hashtable<String, PrintWriter>();
+	private static ArrayList<Socket> sockets = new ArrayList<Socket>();
 	private ServerSocket listener;
 	private Timer surviveReporter;
 
@@ -59,6 +62,17 @@ public class Server extends Thread {
 	}
 
 	public void closeServer() {
+		Client.instance.isExit = true;
+		try {
+			if (lanListener != null) lanListener.listenSocket.close();
+			if (lobbySocket != null) lobbySocket.close();
+			if (listener != null) listener.close();
+			for (Socket socket : sockets)
+				socket.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// Listener for accept client join
@@ -68,14 +82,14 @@ public class Server extends Thread {
 
 		try {
 			while (true) {
-				
+
 				// Client listener is null; when using TCP hole punching
 				// Start listening to lobby server, hole punching request
 				if (listener == null) {
 					String line = lobbyReader.readLine();
 					if (line != null && line.startsWith("CONN")) {
 						TCPHolePuncher puncher = new TCPHolePuncher(TCPHolePuncher.TYPE_HOST, roomName);
-					
+
 						// Wait for TCPHolePuncher finish connect
 						puncher.start();
 						puncher.join();
@@ -84,12 +98,15 @@ public class Server extends Thread {
 						if (socket != null) {
 							// Connection done by TCP hole punching;
 							new Handler(socket, lanListener).start();
+							sockets.add(socket);
 						}
 					}
 				}
 				// Client listener is not null; listen for client connections
 				else {
-					new Handler(listener.accept(), lanListener).start();
+					Socket socket = listener.accept();
+					new Handler(socket, lanListener).start();
+					sockets.add(socket);
 				}
 			}
 		} catch (Exception e) {
@@ -176,10 +193,7 @@ public class Server extends Thread {
 
 				while (true) {
 					String input = in.readLine();
-					if (input == null) {
-						return;
-					}
-					else if (input.startsWith("CHOICE")) {
+					if (input.startsWith("CHOICE")) {
 						String instrument = input.substring(7);
 						for (PrintWriter writer : writers.values()) {
 							writer.println("BROADCAST " + "[Notice] [" + name + "] chose the " + instrument + ".");
@@ -198,7 +212,7 @@ public class Server extends Thread {
 				}
 			} catch (RoomIsFullException e) {
 				// Exception for denial join; user didn't join yet
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// Exception for lost connection
 				numUser--;
 

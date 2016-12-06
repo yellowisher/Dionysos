@@ -163,6 +163,9 @@ public class ClientRoomDialog extends JDialog {
 
 			// Maybe change to local broadcast address something like 192.168.0.255?
 			DatagramPacket request = new DatagramPacket(send, send.length, InetAddress.getByName("255.255.255.255"), 7712);
+			//DatagramPacket request = new DatagramPacket(send, send.length, InetAddress.getByName("192.9.99.255"), 7712);
+			
+			
 			socket.send(request);
 			socket.setSoTimeout(500);
 

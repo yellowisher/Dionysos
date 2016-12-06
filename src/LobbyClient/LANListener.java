@@ -12,7 +12,7 @@ public class LANListener extends Thread {
 	public static final int PORT = 7712;
 	byte[] readBuffer = new byte[4];
 	RoomInfo roomInfo;
-	DatagramSocket listenSocket;
+	public DatagramSocket listenSocket;
 
 	public LANListener(RoomInfo roomInfo) throws SocketException {
 		this.roomInfo = roomInfo;

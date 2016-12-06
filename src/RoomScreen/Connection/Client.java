@@ -1,13 +1,11 @@
 package RoomScreen.Connection;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import javax.swing.BorderFactory;
@@ -24,7 +22,6 @@ import javax.swing.border.LineBorder;
 import Instrument.VirtualDrum.VirtualDrum;
 import Instrument.VirtualGuitar.VirtualGuitar;
 import Instrument.VirtualPiano.VirtualPiano;
-import LobbyClient.LobbyServerInfo;
 import MainScreen.MainFrame;
 import RoomInfo.RoomInfo;
 import RoomScreen.Layout.Choice;
@@ -44,10 +41,12 @@ public class Client extends Thread {
 	RoomPanel frame;
 	JTextField textField;
 	JTextPane messageArea;
-	Client instance;
+	static Client instance;
+	Socket socket;
+	boolean isExit = false;
 
 	JList<String> userList;
-	DefaultListModel<String> listModel = new DefaultListModel<String>();
+	public DefaultListModel<String> listModel = new DefaultListModel<String>();
 	String name = null;
 	PlayManager pm = new PlayManager();
 
@@ -67,6 +66,7 @@ public class Client extends Thread {
 		// Layout GUI
 		textField.setEditable(false);
 		messageArea.setEditable(false);
+		RoomPanel.instance.client = this;
 
 		frame.getJpInstru().removeAll();
 		// Add Listeners
@@ -85,6 +85,17 @@ public class Client extends Thread {
 		});
 	}
 
+	public void leftRoom() {
+		isExit = true;
+		try {
+			socket.close();
+			System.out.println("Closed!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		MainFrame.instance.changePanel("title");
+	}
+
 	private void getChoiceContent() {
 		JPanel j = frame.getJpChoice();
 		Choice cho = (Choice) j.getComponent(0);
@@ -94,7 +105,7 @@ public class Client extends Thread {
 	}
 
 	public void sendMessage(String msg) {
-		System.out.println("Send : "+msg);
+		System.out.println("Send : " + msg);
 		out.println(msg);
 	}
 
@@ -181,7 +192,7 @@ public class Client extends Thread {
 			System.out.println("Client : Client try to connect to " + info.IPAdress + ":" + info.port);
 
 			dialog = new ConnDialog(MainFrame.instance);
-			Socket socket = null;
+			socket = null;
 			if (info.holePunch) {
 				TCPHolePuncher puncher = new TCPHolePuncher(TCPHolePuncher.TYPE_CLIENT, info.roomName);
 				// Wait for TCPHolePuncher finishes connect
@@ -214,7 +225,6 @@ public class Client extends Thread {
 
 			while (true) {
 				String line = in.readLine();
-				System.out.println("Got : "+line);
 				if (line.startsWith("SUBMITNAME")) {
 
 					while (true) {
@@ -268,8 +278,9 @@ public class Client extends Thread {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			MainFrame.instance.changePanel("Title");
+			if (isExit) return;
+			e.printStackTrace();
 			if (name == null) {
 				dialog.dispose();
 				JOptionPane.showMessageDialog(frame, "Cannot connect to host!", "Connection failed", JOptionPane.ERROR_MESSAGE);

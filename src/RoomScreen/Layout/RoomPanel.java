@@ -4,15 +4,19 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.text.Style;
 import javax.swing.GroupLayout;
@@ -48,13 +52,16 @@ public class RoomPanel extends JPanel {
 	public CardLayout instHolder;
 	private JPanel focusDest;
 	public StyledDocument document;
-	
+
 	public Client client;
 	public Server server;
 
 	public boolean isRecording;
 	public Recorder recorder;
 	private JFileChooser fileChooser;
+	private Font buttonFont = new Font("Arial", Font.PLAIN, 20);
+	private int seconds = 0;
+	private Timer timer;
 
 	public static RoomPanel instance;
 	/*
@@ -85,8 +92,20 @@ public class RoomPanel extends JPanel {
 			}
 		});
 	}
+	public void clearAll() {
+		if (client != null) {
+			client.listModel.removeAllElements();
+			userList.setModel(client.listModel);
+		}
+		msgArea.setText("");
+	}
+
 	public void setFocusDest(JPanel p) {
 		focusDest = p;
+	}
+
+	public void setInstFocus() {
+		if (focusDest != null) focusDest.requestFocus();
 	}
 
 	// Because JTextPane has no append() method, home made version of append()
@@ -105,7 +124,6 @@ public class RoomPanel extends JPanel {
 		jpLogo = new javax.swing.JPanel();
 		jPanel2 = new javax.swing.JPanel();
 		recordBtn = new javax.swing.JButton();
-		location = new javax.swing.JLabel();
 		time = new javax.swing.JLabel();
 		exitBtn = new javax.swing.JButton();
 		jpInstru = new javax.swing.JPanel();
@@ -130,11 +148,13 @@ public class RoomPanel extends JPanel {
 		jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Function"));
 		jPanel2.setName(""); // NOI18N
 
+		recordBtn.setFont(buttonFont);
+		exitBtn.setFont(buttonFont);
 		recordBtn.setText("Record");
 		recordBtn.setName(""); // NOI18N
 		exitBtn.setText("Exit");
-		location.setText("Location : C:\\Dionysos\\record\\");
-		time.setText("Time : 00 : 05");
+		time.setText("Duration : 0:00");
+		time.setFont(new Font("Arial", Font.PLAIN, 20));
 
 		exitBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
@@ -153,19 +173,19 @@ public class RoomPanel extends JPanel {
 		jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(jPanel2Layout
 				.createSequentialGroup().addContainerGap()
 				.addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(jPanel2Layout.createSequentialGroup().addComponent(recordBtn, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
+						.addGroup(jPanel2Layout.createSequentialGroup().addComponent(recordBtn, GroupLayout.PREFERRED_SIZE, 220, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(exitBtn,
-										javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-						.addComponent(location).addComponent(time))
+										javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+						.addComponent(time))
 				.addContainerGap(71, Short.MAX_VALUE)));
 		jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(jPanel2Layout.createSequentialGroup().addContainerGap()
 						.addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-								.addComponent(exitBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
+								.addComponent(exitBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
 								.addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false).addComponent(recordBtn,
-										javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)))
+										javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)))
 						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(location).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(time).addContainerGap()));
+						.addComponent(time).addContainerGap()));
 
 		jpInstru.setBackground(new java.awt.Color(255, 204, 255));
 
@@ -184,7 +204,7 @@ public class RoomPanel extends JPanel {
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 		jScrollPane2.setViewportView(msgArea);
-		((DefaultCaret)msgArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		((DefaultCaret) msgArea.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 		sendBtn.setText("Send");
 		jScrollPane1.setViewportView(userList);
@@ -246,6 +266,15 @@ public class RoomPanel extends JPanel {
 								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)));
 	}
 
+	class DurationChanger extends TimerTask {
+		@Override
+		public void run() {
+			int min = (++seconds) / 60;
+			int sec = seconds % 60;
+			time.setText("Duration : " + min + ":" + String.format("%02d", sec));
+		}
+	}
+
 	private void addPanel() {
 		//Logo
 		Logo logoPanel = new Logo(jpLogo);
@@ -258,16 +287,21 @@ public class RoomPanel extends JPanel {
 		jpChoice.add(choicePanel);
 	}
 
-	private void exitBtnActionPerformed(java.awt.event.ActionEvent evt) {
-
+	private void exitBtnActionPerformed(ActionEvent evt) {
+		if (server != null) server.closeServer();
+		else client.leftRoom();
 	}
 
-	private void recordBtnActionPerformed(java.awt.event.ActionEvent evt) {
+	private void recordBtnActionPerformed(ActionEvent evt) {
 		if (isRecording) {
 			// Finish recording
 			isRecording = false;
 			recordBtn.setText("Record");
 			recorder.stop();
+
+			timer.cancel();
+			seconds = 0;
+			time.setText("Duration : 0:00");
 
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss", Locale.KOREA);
 			Date date = new Date();
@@ -290,7 +324,10 @@ public class RoomPanel extends JPanel {
 			recordBtn.setText("[STOP]");
 
 			recorder = new Recorder();
+			timer = new Timer();
+			timer.schedule(new DurationChanger(), 1000, 1000);
 		}
+		setInstFocus();
 	}
 	private void look_feel() {
 		try {
@@ -340,7 +377,6 @@ public class RoomPanel extends JPanel {
 	private javax.swing.JPanel jpChoice;
 	private javax.swing.JPanel jpInstru;
 	private javax.swing.JPanel jpLogo;
-	private javax.swing.JLabel location;
 
 	public javax.swing.JButton recordBtn;
 	private javax.swing.JButton sendBtn;

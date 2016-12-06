@@ -46,7 +46,7 @@ public class MainFrame extends JFrame {
 
 	public void changePanel(String name) {
 		if (name.equals("Room")) {
-			RoomPanel.instance.msgArea.setText("");
+			RoomPanel.instance.clearAll();
 		}
 		panelHolder.show(getContentPane(), name);
 	}
