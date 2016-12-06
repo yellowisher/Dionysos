@@ -86,7 +86,8 @@ public class ClientRoomDialog extends JDialog {
 				}
 			}
 		});
-		// Refreshing, requesting room list is depends on LAN or online
+		// Refreshing, requesting room list
+		// It is totally depends on room type is LAN or online
 		if (lanOnly ? lanRefresh() : refresh()) setVisible(true);
 	}
 
@@ -161,10 +162,9 @@ public class ClientRoomDialog extends JDialog {
 			socket.setBroadcast(true);
 			socket.bind(null);
 
-			// Maybe change to local broadcast address something like 192.168.0.255?
+			// Maybe change to subnet broadcast address something like 192.168.1.255?
 			DatagramPacket request = new DatagramPacket(send, send.length, InetAddress.getByName("255.255.255.255"), 7712);
 			//DatagramPacket request = new DatagramPacket(send, send.length, InetAddress.getByName("192.9.99.255"), 7712);
-			
 			
 			socket.send(request);
 			socket.setSoTimeout(500);

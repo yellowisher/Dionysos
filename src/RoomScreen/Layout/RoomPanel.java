@@ -293,7 +293,16 @@ public class RoomPanel extends JPanel {
 	}
 
 	private void recordBtnActionPerformed(ActionEvent evt) {
-		if (isRecording) {
+		if (!isRecording) {
+			// Start recording
+			isRecording = true;
+			recordBtn.setText("[STOP]");
+
+			recorder = new Recorder();
+			timer = new Timer();
+			timer.schedule(new DurationChanger(), 1000, 1000);
+		}
+		else {
 			// Finish recording
 			isRecording = false;
 			recordBtn.setText("Record");
@@ -317,15 +326,6 @@ public class RoomPanel extends JPanel {
 				e.printStackTrace();
 			}
 			recorder = null;
-		}
-		else {
-			// Start recording
-			isRecording = true;
-			recordBtn.setText("[STOP]");
-
-			recorder = new Recorder();
-			timer = new Timer();
-			timer.schedule(new DurationChanger(), 1000, 1000);
 		}
 		setInstFocus();
 	}

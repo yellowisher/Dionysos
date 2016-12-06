@@ -15,8 +15,8 @@ public class PlayManager {
 	
 	/*
 	 * Clip get by AudioSystem is OS resource, DO NOT store it to map,
-	 * have to return it to OS after use
-	 * And attach listener to close Clip
+	 * have to return it to OS after use (something like DC in win32 api?)
+	 * And attach listener to close Clip when it ends
 	 */
 	public void play(String instru, String code) throws Exception {
 		Clip clip = AudioSystem.getClip();
